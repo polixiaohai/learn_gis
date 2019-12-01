@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <AnchorPane fx:id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson4.controller.MainController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson5.controller.MainController">
     <children>
         <Canvas fx:id="mainCanvas" height="400.0" layoutX="6.0" width="600.0"/>
         <TextField fx:id="txtX" layoutX="38.0" layoutY="22.0" prefHeight="23.0" prefWidth="114.0"/>
