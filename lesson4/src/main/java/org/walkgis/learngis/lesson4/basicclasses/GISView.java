@@ -16,6 +16,11 @@ public class GISView {
         update(currentMapExtent, mapWindowSize);
     }
 
+    public void changeView(GISMapAction action) {
+        currentMapExtent.changeExtent(action);
+        update(currentMapExtent, mapWindowSize);
+    }
+
     public void update(GISExtent currentMapExtent, Rectangle mapWindowSize) {
         this.currentMapExtent = currentMapExtent;
         this.mapWindowSize = mapWindowSize;

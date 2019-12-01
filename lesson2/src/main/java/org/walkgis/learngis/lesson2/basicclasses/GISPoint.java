@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson3.basicclasses;
+package org.walkgis.learngis.lesson4.basicclasses;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

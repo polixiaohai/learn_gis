@@ -26,7 +26,7 @@ public class MainController implements Initializable {
     @FXML
     private TextField txtX, txtY, txtAttribute, txtExtent;
     @FXML
-    private Button btnDraw, btnUpdateExtent;
+    private Button btnDraw, btnUpdateExtent, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight;
 
     private List<GISFeature> gisFeatures = new ArrayList<>();
 
@@ -40,12 +40,42 @@ public class MainController implements Initializable {
         btnDraw.setOnMouseClicked(this::btnDrawPoint);
         mainCanvas.setOnMouseClicked(this::canvasClick);
         btnUpdateExtent.setOnMouseClicked(this::btnUpdateExtentClick);
+        btnZoomIn.setOnMouseClicked(this::mapActionClick);
+        btnZoomOut.setOnMouseClicked(this::mapActionClick);
+        btnMoveUp.setOnMouseClicked(this::mapActionClick);
+        btnMoveDown.setOnMouseClicked(this::mapActionClick);
+        btnMoveLeft.setOnMouseClicked(this::mapActionClick);
+        btnMoveRight.setOnMouseClicked(this::mapActionClick);
+        txtExtent.setText("-1000,-1000,1000,1000");
 
         gisFeatures.add(new GISFeature(new GISPoint(new GISVertex(20, 30)), new GISAttribute("1")));
         gisFeatures.add(new GISFeature(new GISPoint(new GISVertex(300, 100)), new GISAttribute("2")));
         gisFeatures.add(new GISFeature(new GISPoint(new GISVertex(150, 400)), new GISAttribute("3")));
         gisFeatures.add(new GISFeature(new GISPoint(new GISVertex(500, 200)), new GISAttribute("4")));
 
+        for (int i = 0; i < gisFeatures.size(); i++) {
+            gisFeatures.get(i).draw(mainCanvas.getGraphicsContext2D(), gisView, true, 0);
+        }
+
+        btnUpdateExtentClick(null);
+    }
+
+    private void mapActionClick(MouseEvent event) {
+        GISMapAction action = GISMapAction.zoomin;
+        if (btnZoomIn == event.getSource()) action = GISMapAction.zoomin;
+        else if (btnZoomOut == event.getSource()) action = GISMapAction.zoomout;
+        else if (btnMoveUp == event.getSource()) action = GISMapAction.moveup;
+        else if (btnMoveDown == event.getSource()) action = GISMapAction.movedown;
+        else if (btnMoveLeft == event.getSource()) action = GISMapAction.movelet;
+        else if (btnMoveRight == event.getSource()) action = GISMapAction.moveright;
+        gisView.changeView(action);
+        updateMap();
+    }
+
+
+    private void updateMap() {
+        mainCanvas.getGraphicsContext2D().setFill(Color.WHITE);
+        mainCanvas.getGraphicsContext2D().fillRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
         for (int i = 0; i < gisFeatures.size(); i++) {
             gisFeatures.get(i).draw(mainCanvas.getGraphicsContext2D(), gisView, true, 0);
         }
@@ -62,12 +92,8 @@ public class MainController implements Initializable {
         double maxy = Double.parseDouble(text[3]);
 
         gisView.update(new GISExtent(minx, maxx, miny, maxy), clientRectangle);
-        mainCanvas.getGraphicsContext2D().setFill(Color.WHITE);
-        mainCanvas.getGraphicsContext2D().fillRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
 
-        for (int i = 0; i < gisFeatures.size(); i++) {
-            gisFeatures.get(i).draw(mainCanvas.getGraphicsContext2D(), gisView, true, 0);
-        }
+        updateMap();
     }
 
     @FXML

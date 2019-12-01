@@ -1,12 +1,12 @@
-package org.walkgis.learngis.lesson3;
+package org.walkgis.learngis.lesson4;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.walkgis.learngis.lesson3.view.InitSplash;
-import org.walkgis.learngis.lesson3.view.MainView;
+import org.walkgis.learngis.lesson4.view.InitSplash;
+import org.walkgis.learngis.lesson4.view.MainView;
 
 @SpringBootApplication
 public class Lesson2Application extends AbstractJavaFxApplicationSupport {

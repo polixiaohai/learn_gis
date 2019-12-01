@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson4.controller.MainController">
+    <children>
+        <Canvas fx:id="mainCanvas" height="400.0" layoutX="6.0" width="600.0"/>
+        <TextField fx:id="txtX" layoutX="38.0" layoutY="22.0" prefHeight="23.0" prefWidth="114.0"/>
+        <TextField fx:id="txtY" layoutX="160.0" layoutY="22.0" prefHeight="23.0" prefWidth="103.0"/>
+        <TextField fx:id="txtAttribute" layoutX="272.0" layoutY="22.0"/>
+        <Button fx:id="btnDraw" layoutX="466.0" layoutY="22.0" mnemonicParsing="false" text="添加点"/>
+        <TextField fx:id="txtExtent" layoutX="38.0" layoutY="57.0" prefHeight="23.0" prefWidth="395.0"/>
+        <Button fx:id="btnUpdateExtent" layoutX="466.0" layoutY="57.0" mnemonicParsing="false" text="更新范围"/>
+        <Button fx:id="btnZoomIn" layoutX="38.0" layoutY="89.0" mnemonicParsing="false" text="放大"/>
+        <Button fx:id="btnZoomOut" layoutX="86.0" layoutY="89.0" mnemonicParsing="false" text="缩小"/>
+        <Button fx:id="btnMoveUp" layoutX="140.0" layoutY="89.0" mnemonicParsing="false" text="上移"/>
+        <Button fx:id="btnMoveDown" layoutX="194.0" layoutY="89.0" mnemonicParsing="false" text="下移"/>
+        <Button fx:id="btnMoveLeft" layoutX="245.0" layoutY="89.0" mnemonicParsing="false" text="左移"/>
+        <Button fx:id="btnMoveRight" layoutX="298.0" layoutY="89.0" mnemonicParsing="false" text="右移"/>
+    </children>
+</AnchorPane>

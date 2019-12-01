@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson3.basicclasses;
+package org.walkgis.learngis.lesson4.basicclasses;
 
 import java.util.Map;
 
