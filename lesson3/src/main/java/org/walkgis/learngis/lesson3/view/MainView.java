@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson4.view;
+package org.walkgis.learngis.lesson3.view;
 
 import de.felixroske.jfxsupport.AbstractFxmlView;
 import de.felixroske.jfxsupport.FXMLView;

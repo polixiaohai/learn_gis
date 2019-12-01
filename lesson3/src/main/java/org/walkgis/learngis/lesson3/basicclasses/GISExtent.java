@@ -1,6 +1,5 @@
-package org.walkgis.learngis.lesson4.basicclasses;
+package org.walkgis.learngis.lesson3.basicclasses;
 
-import java.util.Map;
 
 public class GISExtent {
     public GISVertex bottomLeft;
