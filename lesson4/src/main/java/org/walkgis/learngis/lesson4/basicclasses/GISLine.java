@@ -1,9 +1,10 @@
-package org.walkgis.learngis.lesson5.basicclasses;
+package org.walkgis.learngis.lesson4.basicclasses;
 
 import javafx.scene.canvas.GraphicsContext;
+
 import java.util.List;
 
-public class GISPolygon extends GISSpatial{
+public class GISLine extends GISSpatial {
     public List<GISVertex> allVertexs;
 
     @Override

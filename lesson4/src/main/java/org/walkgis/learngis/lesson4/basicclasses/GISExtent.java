@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson5.basicclasses;
+package org.walkgis.learngis.lesson4.basicclasses;
 
 public class GISExtent {
     public GISVertex bottomLeft;

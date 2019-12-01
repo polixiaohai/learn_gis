@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson5.view;
+package org.walkgis.learngis.lesson4.view;
 
 
 import de.felixroske.jfxsupport.SplashScreen;

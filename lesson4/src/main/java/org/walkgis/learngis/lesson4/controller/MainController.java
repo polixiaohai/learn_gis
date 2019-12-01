@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson5.controller;
+package org.walkgis.learngis.lesson4.controller;
 
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.fxml.FXML;
@@ -10,7 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.walkgis.learngis.lesson5.basicclasses.*;
+import org.walkgis.learngis.lesson4.basicclasses.*;
 
 import java.awt.Point;
 import java.net.URL;
