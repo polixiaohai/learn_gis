@@ -1,4 +1,4 @@
-package org.walkgis.learngis.lesson4.controller;
+package org.walkgis.learngis.lesson2.controller;
 
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.fxml.FXML;
@@ -8,12 +8,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import org.walkgis.learngis.lesson4.basicclasses.GISAttribute;
-import org.walkgis.learngis.lesson4.basicclasses.GISFeature;
-import org.walkgis.learngis.lesson4.basicclasses.GISPoint;
-import org.walkgis.learngis.lesson4.basicclasses.GISVertex;
-
+import org.walkgis.learngis.lesson2.basicclasses.GISAttribute;
+import org.walkgis.learngis.lesson2.basicclasses.GISFeature;
+import org.walkgis.learngis.lesson2.basicclasses.GISPoint;
+import org.walkgis.learngis.lesson2.basicclasses.GISVertex;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
