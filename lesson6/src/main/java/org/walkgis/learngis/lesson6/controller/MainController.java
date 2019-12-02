@@ -1,5 +1,6 @@
 package org.walkgis.learngis.lesson6.controller;
 
+import com.sun.xml.internal.ws.policy.EffectiveAlternativeSelector;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.walkgis.learngis.lesson6.basicclasses.*;
+
 import java.awt.Point;
 import java.io.File;
 import java.net.URL;
@@ -52,7 +54,7 @@ public class MainController implements Initializable {
     private void btnFullScreen(MouseEvent event) {
         if (layer == null) return;
         view.updateExtent(layer.extent);
-        updateMap();
+        updateMap(true);
     }
 
     @FXML
@@ -74,7 +76,7 @@ public class MainController implements Initializable {
             layer = gisShapefile.readShapefile(file.getAbsolutePath());
             layer.drawAttributeOrNot = false;
 
-            updateMap();
+            updateMap(false);
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("信息框");
@@ -93,12 +95,14 @@ public class MainController implements Initializable {
         else if (btnMoveLeft == event.getSource()) action = GISMapAction.movelet;
         else if (btnMoveRight == event.getSource()) action = GISMapAction.moveright;
         view.changeView(action);
-        updateMap();
+        updateMap(true);
     }
 
-    private void updateMap() {
-        mainCanvas.getGraphicsContext2D().setFill(Color.WHITE);
-        mainCanvas.getGraphicsContext2D().fillRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
+    private void updateMap(boolean clear) {
+        if (clear) {
+            mainCanvas.getGraphicsContext2D().setFill(Color.WHITE);
+            mainCanvas.getGraphicsContext2D().fillRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
+        }
         if (layer == null) return;
         layer.draw(mainCanvas.getGraphicsContext2D(), view);
     }
