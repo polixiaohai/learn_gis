@@ -87,9 +87,9 @@ public class GISShapefile {
         byte[] intByte = new byte[4];
         try {
             dataInputStream.read(intByte);
-            recordHeader.RecordNumber = fromBigToLittle(Utils.bytes2Int(intByte, 0));
+            recordHeader.RecordNumber = Utils.bytes2Int(intByte, 0);
             dataInputStream.read(intByte);
-            recordHeader.RecordLength = fromBigToLittle(Utils.bytes2Int(intByte, 0));
+            recordHeader.RecordLength = Utils.bytes2Int(intByte, 0);
             dataInputStream.read(intByte);
             recordHeader.ShapeType = Utils.bytes2Int(intByte, 0);
         } catch (Exception ex) {
@@ -129,7 +129,7 @@ public class GISShapefile {
             while (br.available() > 0) {
                 //读记录头
                 RecordHeader rh = readRecordHeader(br);
-                int recordLength = rh.RecordLength * 2 - 4;
+                int recordLength = fromBigToLittle(rh.RecordLength) * 2 - 4;
                 byte[] recordContent = new byte[recordLength];
                 br.read(recordContent);
                 //开始读实际的空间数据
