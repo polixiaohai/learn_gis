@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson8.controller.MainController">
+    <children>
+        <Canvas fx:id="mainCanvas" height="400.0" layoutX="6.0" width="600.0"/>
+        <Button fx:id="btnZoomIn" layoutX="197.0" layoutY="14.0" mnemonicParsing="false" text="放大"/>
+        <Button fx:id="btnZoomOut" layoutX="245.0" layoutY="14.0" mnemonicParsing="false" text="缩小"/>
+        <Button fx:id="btnMoveUp" layoutX="299.0" layoutY="14.0" mnemonicParsing="false" text="上移"/>
+        <Button fx:id="btnMoveDown" layoutX="353.0" layoutY="14.0" mnemonicParsing="false" text="下移"/>
+        <Button fx:id="btnMoveLeft" layoutX="404.0" layoutY="14.0" mnemonicParsing="false" text="左移"/>
+        <Button fx:id="btnMoveRight" layoutX="457.0" layoutY="14.0" mnemonicParsing="false" text="右移"/>
+        <Button fx:id="btnOpenShp" layoutX="26.0" layoutY="14.0" mnemonicParsing="false" text="打开Shp"/>
+        <Button fx:id="btnFullScreen" layoutX="104.0" layoutY="14.0" mnemonicParsing="false" text="全图"/>
+        <Button fx:id="btnAttributeTable" layoutX="514.0" layoutY="14.0" mnemonicParsing="false" text="属性表"/>
+    </children>
+</AnchorPane>
