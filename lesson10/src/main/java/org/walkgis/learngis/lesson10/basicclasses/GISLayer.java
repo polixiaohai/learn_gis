@@ -10,7 +10,7 @@ public class GISLayer {
     public String name;
     public GISExtent extent;
     public Boolean drawAttributeOrNot = true;
-    public int labelIndex = 4;
+    public int labelIndex = 2;
     public SHAPETYPE shapeType;
     public List<GISField> fields;
     public List<GISFeature> features = new ArrayList<GISFeature>();

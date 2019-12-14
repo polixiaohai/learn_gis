@@ -88,7 +88,7 @@ public class MainController implements Initializable {
         File file = fileChooser.showOpenDialog(selectFile);
         if (file != null) {
             layer = gisShapefile.readShapefile(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
-            layer.drawAttributeOrNot = false;
+            layer.drawAttributeOrNot = true;
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("信息框");
             alert.setHeaderText("打开成功");

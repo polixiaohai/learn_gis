@@ -16,6 +16,6 @@
         <Button fx:id="btnOpenShp" layoutX="26.0" layoutY="14.0" mnemonicParsing="false" text="打开Shp" />
         <Button fx:id="btnFullScreen" layoutX="104.0" layoutY="14.0" mnemonicParsing="false" text="全图" />
         <Button fx:id="btnAttributeTable" layoutX="514.0" layoutY="14.0" mnemonicParsing="false" text="属性表" />
-        <Label fx:id="lblPosition" layoutX="414.0" layoutY="371.0" text="" />
+        <Label fx:id="lblPosition" layoutX="384.0" layoutY="571.0" prefHeight="15.0" prefWidth="186.0" text="" />
     </children>
 </AnchorPane>

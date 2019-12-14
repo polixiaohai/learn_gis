@@ -24,17 +24,17 @@ public class GISTools {
 
     public static GISExtent calculateExtent(List<GISVertex> vertices) {
         if (vertices.size() == 0) return null;
-        final double[] minx = {Double.MAX_VALUE};
-        final double[] miny = {Double.MAX_VALUE};
-        final double[] maxx = {Double.MIN_VALUE};
-        final double[] maxy = {Double.MIN_VALUE};
-        vertices.forEach(vertex -> {
-            minx[0] = Math.min(vertex.x, minx[0]);
-            miny[0] = Math.min(vertex.y, miny[0]);
-            maxx[0] = Math.max(vertex.x, maxx[0]);
-            maxy[0] = Math.max(vertex.y, maxy[0]);
-        });
-        return new GISExtent(new GISVertex(minx[0], miny[0]), new GISVertex(maxx[0], maxy[0]));
+        double minx = Double.MAX_VALUE;
+        double miny = Double.MAX_VALUE;
+        double maxx = Double.MIN_VALUE;
+        double maxy = Double.MIN_VALUE;
+        for (GISVertex vertex : vertices) {
+            minx = Math.min(vertex.x, minx);
+            miny = Math.min(vertex.y, miny);
+            maxx = Math.max(vertex.x, maxx);
+            maxy = Math.max(vertex.y, maxy);
+        }
+        return new GISExtent(new GISVertex(minx, miny), new GISVertex(maxx, maxy));
     }
 
     public static double calculateLength(List<GISVertex> vertices) {

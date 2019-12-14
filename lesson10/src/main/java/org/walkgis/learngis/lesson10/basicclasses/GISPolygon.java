@@ -2,6 +2,7 @@ package org.walkgis.learngis.lesson10.basicclasses;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.FillRule;
 
 import java.awt.*;
 import java.util.List;
@@ -20,13 +21,15 @@ public class GISPolygon extends GISSpatial {
     @Override
     public void draw(GraphicsContext graphicsContext, GISView view) {
         List<Point> points = GISTools.getScreenPoints(vertexs, view);
-        graphicsContext.setFill(Color.YELLOW);
+        graphicsContext.setFill(Color.web("#2ecc71", 0.6));
         double[] polygonsX = new double[points.size()], polygonsY = new double[points.size()];
         for (int i = 0, size = points.size(); i < size; i++) {
             polygonsX[i] = points.get(i).x;
             polygonsY[i] = points.get(i).y;
         }
         graphicsContext.fillPolygon(polygonsX, polygonsY, points.size());
+        graphicsContext.setStroke(Color.BLUE);
+        graphicsContext.strokePolygon(polygonsX, polygonsY, points.size());
     }
 
     public boolean include(GISVertex vertex) {
