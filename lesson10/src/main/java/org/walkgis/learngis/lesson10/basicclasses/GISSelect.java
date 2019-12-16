@@ -30,7 +30,8 @@ public class GISSelect {
             if (!minExtent.insertectOrNot(features.get(i).spatial.extent)) continue;
             GISPolygon polygon = (GISPolygon) features.get(i).spatial;
 
-            if (polygon.include(vertex)) {
+            System.out.println(features.get(i).attribute.getValue(2));
+            if (polygon.include2(vertex)) {
                 selectedFeatures.add(features.get(i));
             }
         }
@@ -43,7 +44,7 @@ public class GISSelect {
         //筛选出屏幕视图范围内距离最近的要素
         for (int i = 0; i < features.size(); i++) {
             if (!minExtent.insertectOrNot(features.get(i).spatial.extent)) continue;
-            GISLine line = (GISLine) features.get(i).spatial;
+            GISPolyline line = (GISPolyline) features.get(i).spatial;
 
             double dist = line.distance(vertex);
             if (dist < distance) {

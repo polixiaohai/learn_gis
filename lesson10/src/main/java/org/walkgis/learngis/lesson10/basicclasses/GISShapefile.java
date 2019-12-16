@@ -145,7 +145,7 @@ public class GISShapefile {
                     GISFeature onefeature = new GISFeature(onepoint, new GISAttribute(rowValues));
                     layer.addFeature(onefeature);
                 } else if (ShapeType == SHAPETYPE.polyline) {
-                    List<GISLine> lines = readLines(recordContent);
+                    List<GISPolyline> lines = readLines(recordContent);
                     GISLayer finalLayer = layer;
                     Object[] finalRowValues = rowValues;
                     lines.forEach(line -> {
@@ -225,7 +225,7 @@ public class GISShapefile {
         return new GISPoint(new GISVertex(x, y));
     }
 
-    private List<GISLine> readLines(byte[] recordContent) {
+    private List<GISPolyline> readLines(byte[] recordContent) {
         //自线段个数
         int N = Utils.bytes2Int(recordContent, 32);
         //坐标点数
@@ -235,7 +235,7 @@ public class GISShapefile {
         for (int i = 0; i < N; i++)
             parts[i] = Utils.bytes2Int(recordContent, 40 + i * 4);
         parts[N] = M;
-        List<GISLine> lines = new ArrayList<>();
+        List<GISPolyline> lines = new ArrayList<>();
         for (int i = 0; i < N; i++) {
             List<GISVertex> vertices = new ArrayList<>();
             for (int j = parts[i]; j < parts[i + 1]; j++) {
@@ -243,7 +243,7 @@ public class GISShapefile {
                 double y = Utils.bytes2Double(recordContent, 40 + N * 4 + j * 16 + 8);
                 vertices.add(new GISVertex(x, y));
             }
-            lines.add(new GISLine(vertices));
+            lines.add(new GISPolyline(vertices));
         }
         return lines;
     }

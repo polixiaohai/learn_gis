@@ -1,7 +1,6 @@
 package org.walkgis.learngis.lesson10.basicclasses;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 
 import java.awt.*;
@@ -17,9 +16,13 @@ public class GISPoint extends GISSpatial {
     }
 
     @Override
-    public void draw(GraphicsContext graphicsContext, GISView gisView) {
+    public void draw(GraphicsContext graphicsContext, GISView gisView, boolean isSelected) {
         Point screenPoint = gisView.toScreenPoint(center);
-        graphicsContext.setFill(Color.RED);
-        graphicsContext.fillArc(screenPoint.x, screenPoint.y, 6, 6, 0, 360, ArcType.OPEN);
+        graphicsContext.setFill(isSelected ? GISConst.selectedPointColor : GISConst.pointColor);
+        graphicsContext.fillArc(
+                screenPoint.x - GISConst.pointSize,
+                screenPoint.y - GISConst.pointSize,
+                GISConst.pointSize * 2,
+                GISConst.pointSize * 2, 0, 360, ArcType.OPEN);
     }
 }

@@ -33,9 +33,9 @@ public class MainController implements Initializable {
     @FXML
     private Canvas mainCanvas;
     @FXML
-    private Button btnOpenShp, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnAttributeTable;
+    private Button btnOpenShp, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnAttributeTable, btnClear;
     @FXML
-    private Label lblPosition;
+    private Label lblPosition, lblCount;
 
     private GISView view;
     private GISLayer layer;
@@ -56,6 +56,16 @@ public class MainController implements Initializable {
         btnOpenShp.setOnMouseClicked(this::btnOpenShpClick);
         btnFullScreen.setOnMouseClicked(this::btnFullScreen);
         btnAttributeTable.setOnMouseClicked(this::btnAttributeTableClick);
+        btnClear.setOnMouseClicked(this::btnClearClick);
+    }
+
+    @FXML
+    private void btnClearClick(MouseEvent mouseEvent) {
+        if (layer == null) return;
+        layer.clearSelection();
+        updateMap(true);
+        //更新状态栏
+        lblCount.setText("当前选中：0");
     }
 
     @FXML
@@ -100,6 +110,7 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
     private void mapActionClick(MouseEvent event) {
         GISMapAction action = GISMapAction.zoomin;
         if (btnZoomIn == event.getSource()) action = GISMapAction.zoomin;
@@ -132,12 +143,11 @@ public class MainController implements Initializable {
     private void canvasClick(MouseEvent event) {
         if (layer == null) return;
         GISVertex gisVertex = view.toMapVertex(new Point((int) event.getX(), (int) event.getY()));
-        GISSelect gisSelect = new GISSelect();
-        if (gisSelect.select(gisVertex, layer.features, layer.shapeType, view) == SelectResult.OK) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-
-            alert.setContentText(gisSelect.selectedFeatures.get(0).getAttribute(4).toString());
-            alert.showAndWait();
+        SelectResult selectResult = layer.select(gisVertex, view);
+        if (selectResult == SelectResult.OK) {
+            updateMap(true);
+            //更新状态栏
+            lblCount.setText("当前选中：" + layer.selection.size());
         }
     }
 

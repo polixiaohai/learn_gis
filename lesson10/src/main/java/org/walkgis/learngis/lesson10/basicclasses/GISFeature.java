@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 public class GISFeature {
     public GISSpatial spatial;
     public GISAttribute attribute;
+    public boolean isSelected = false;
 
     public GISFeature(GISSpatial spatial, GISAttribute attribute) {
         this.spatial = spatial;
@@ -12,7 +13,7 @@ public class GISFeature {
     }
 
     public void draw(GraphicsContext graphicsContext, GISView gisView, boolean drawAttributeOrNot, int index) {
-        spatial.draw(graphicsContext, gisView);
+        spatial.draw(graphicsContext, gisView, isSelected);
         if (drawAttributeOrNot) {
             attribute.draw(graphicsContext, gisView, spatial.center, index);
         }
