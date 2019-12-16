@@ -1,7 +1,7 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
 
-import javafx.scene.paint.Color;
+import java.awt.*;
 
 public class GISConst {
     public static double minScreenDistance = 5;
@@ -17,9 +17,9 @@ public class GISConst {
     public static Color polygonFillColor = Color.GRAY;
     public static int polygonBoundaryWidth = 1;
     //被选中的点的颜色
-    public static Color selectedPointColor = Color.AQUA;
+    public static Color selectedPointColor = Color.CYAN;
     //被选中的线颜色
-    public static Color selectedLineColor = Color.AQUA;
+    public static Color selectedLineColor = Color.CYAN;
     //被选中的面的线颜色
-    public static Color selectedPolygonBoundaryColor = Color.AQUA;
+    public static Color selectedPolygonBoundaryColor = Color.CYAN;
 }

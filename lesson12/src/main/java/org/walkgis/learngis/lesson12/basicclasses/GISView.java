@@ -38,26 +38,16 @@ public class GISView {
         this.mapH = currentMapExtent.getHeight();
         this.scaleX = mapW / winW;
         this.scaleY = mapH / winH;
+        this.scaleX = Math.max(scaleX, scaleY);
+        this.scaleY = scaleX;
 
+        this.mapW = this.mapWindowSize.getWidth() * scaleX;
+        this.mapH = this.mapWindowSize.getHeight() * scaleY;
 
-//        this.currentMapExtent = currentMapExtent;
-//        this.mapWindowSize = mapWindowSize;
-//        this.winW = (int) mapWindowSize.getWidth();
-//        this.winH = (int) mapWindowSize.getHeight();
-//
-//        this.scaleX = this.currentMapExtent.getWidth() / winW;
-//        this.scaleY = this.currentMapExtent.getHeight() / winH;
-//        this.scaleX = Math.max(scaleX, scaleY);
-//        this.scaleY = scaleX;
-//
-//        this.mapW = this.mapWindowSize.getWidth() * scaleX;
-//        this.mapH = this.mapWindowSize.getHeight() * scaleY;
-//
-//        GISVertex center = currentMapExtent.getCenter();
-//
-//        this.mapMinX = center.x - mapW / 2;
-//        this.mapMinY = center.y - mapH / 2;
-//
+        GISVertex center = currentMapExtent.getCenter();
+        this.mapMinX = center.x - mapW / 2;
+        this.mapMinY = center.y - mapH / 2;
+
 //        this.currentMapExtent = new GISExtent(new GISVertex(mapMinX, mapMinY), new GISVertex(mapMinX + mapW, mapMinY + mapH));
     }
 
@@ -84,5 +74,14 @@ public class GISView {
 
     public Double toScreenDistance(Double distance) {
         return toScreenDistance(new GISVertex(0, 0), new GISVertex(0, distance));
+    }
+
+    public void updateRectangle(Rectangle clientRectangle) {
+        this.mapWindowSize = clientRectangle;
+        update(currentMapExtent, mapWindowSize);
+    }
+
+    public GISExtent getRealExtent() {
+        return new GISExtent(mapMinX, mapMinX + mapW, mapMinY ,mapMinY + mapH);
     }
 }

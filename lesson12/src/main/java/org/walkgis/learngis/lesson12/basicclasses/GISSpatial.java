@@ -1,10 +1,10 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
-import javafx.scene.canvas.GraphicsContext;
+import java.awt.*;
 
 public abstract class GISSpatial {
     public GISVertex center;
     public GISExtent extent;
 
-    public abstract void draw(GraphicsContext graphicsContext, GISView gisView, boolean isSelected);
+    public abstract void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected);
 }

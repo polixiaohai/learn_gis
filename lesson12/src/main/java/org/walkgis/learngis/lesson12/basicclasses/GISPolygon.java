@@ -1,8 +1,5 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
 import java.awt.*;
 import java.util.List;
 
@@ -18,20 +15,20 @@ public class GISPolygon extends GISSpatial {
     }
 
     @Override
-    public void draw(GraphicsContext graphicsContext, GISView view, boolean isSelected) {
+    public void draw(Graphics2D graphicsContext, GISView view, boolean isSelected) {
         List<Point> points = GISTools.getScreenPoints(vertexs, view);
 
-        graphicsContext.setFill(GISConst.polygonFillColor);
-        double[] polygonsX = new double[points.size()], polygonsY = new double[points.size()];
+        graphicsContext.setColor(GISConst.polygonFillColor);
+        int[] polygonsX = new int[points.size()], polygonsY = new int[points.size()];
         for (int i = 0, size = points.size(); i < size; i++) {
             polygonsX[i] = points.get(i).x;
             polygonsY[i] = points.get(i).y;
         }
         graphicsContext.fillPolygon(polygonsX, polygonsY, points.size());
 
-        graphicsContext.setStroke(isSelected ? GISConst.selectedPolygonBoundaryColor : GISConst.polygonBoundaryColor);
-        graphicsContext.setLineWidth(GISConst.polygonBoundaryWidth);
-        graphicsContext.strokePolygon(polygonsX, polygonsY, points.size());
+        graphicsContext.setColor(isSelected ? GISConst.selectedPolygonBoundaryColor : GISConst.polygonBoundaryColor);
+        graphicsContext.setStroke(new BasicStroke(GISConst.polygonBoundaryWidth));
+        graphicsContext.drawPolygon(polygonsX, polygonsY, points.size());
     }
 
     public boolean include(GISVertex vertex) {

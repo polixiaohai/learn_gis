@@ -2,6 +2,7 @@ package org.walkgis.learngis.lesson12.controller;
 
 import de.felixroske.jfxsupport.AbstractFxmlView;
 import de.felixroske.jfxsupport.FXMLController;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -9,8 +10,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -23,7 +25,8 @@ import org.walkgis.learngis.lesson12.Lesson12Application;
 import org.walkgis.learngis.lesson12.basicclasses.*;
 import org.walkgis.learngis.lesson12.view.DataTableView;
 
-import java.awt.Point;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -43,6 +46,7 @@ public class MainController implements Initializable {
     private DataTableController dataTableController;
     @Autowired
     private ApplicationContext applicationContext;
+    private BufferedImage backgroundWindow;
 
     private GISView view;
     private GISLayer layer;
@@ -70,7 +74,7 @@ public class MainController implements Initializable {
     private void btnClearClick(MouseEvent mouseEvent) {
         if (layer == null) return;
         layer.clearSelection();
-        updateMap(true);
+        updateMap();
         //更新状态栏
         lblCount.setText("当前选中：0");
         updateAttributeWindow();
@@ -104,7 +108,7 @@ public class MainController implements Initializable {
     private void btnFullScreen(MouseEvent event) {
         if (layer == null) return;
         view.updateExtent(layer.extent);
-        updateMap(true);
+        updateMap();
     }
 
     @FXML
@@ -133,7 +137,7 @@ public class MainController implements Initializable {
             alert.showAndWait();
 
             view.updateExtent(layer.extent);
-            updateMap(false);
+            updateMap();
         }
     }
 
@@ -147,16 +151,25 @@ public class MainController implements Initializable {
         else if (btnMoveLeft == event.getSource()) action = GISMapAction.movelet;
         else if (btnMoveRight == event.getSource()) action = GISMapAction.moveright;
         view.updateExtent(action);
-        updateMap(true);
+        updateMap();
     }
 
-    void updateMap(boolean clear) {
-        if (clear) {
-            mainCanvas.getGraphicsContext2D().setFill(Color.WHITE);
-            mainCanvas.getGraphicsContext2D().fillRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
-        }
+    void updateMap() {
         if (layer == null) return;
-        layer.draw(mainCanvas.getGraphicsContext2D(), view);
+        if (clientRectangle.getWidth() * clientRectangle.getHeight() == 0) return;
+        view.updateRectangle(clientRectangle);
+
+        if (backgroundWindow != null) backgroundWindow = null;
+        backgroundWindow = new BufferedImage((int) clientRectangle.getWidth(), (int) clientRectangle.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        //背景窗口上绘图
+        Graphics2D graphics = (Graphics2D) backgroundWindow.getGraphics();
+        graphics.setBackground(Color.WHITE);
+        graphics.clearRect(0, 0, (int) clientRectangle.getWidth(), (int) clientRectangle.getHeight());
+        layer.draw(graphics, view);
+
+        WritableImage image = SwingFXUtils.toFXImage(backgroundWindow, null);
+        mainCanvas.getGraphicsContext2D().drawImage(image, 0, 0);
         lblCount.setText("当前选中：" + layer.selection.size());
     }
 
@@ -173,7 +186,7 @@ public class MainController implements Initializable {
         GISVertex gisVertex = view.toMapVertex(new Point((int) event.getX(), (int) event.getY()));
         SelectResult selectResult = layer.select(gisVertex, view);
         if (selectResult == SelectResult.OK) {
-            updateMap(true);
+            updateMap();
             //更新状态栏
             lblCount.setText("当前选中：" + layer.selection.size());
             updateAttributeWindow();

@@ -1,9 +1,6 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
-import java.awt.Point;
+import java.awt.*;
 import java.util.List;
 
 public class GISPolyline extends GISSpatial {
@@ -18,18 +15,18 @@ public class GISPolyline extends GISSpatial {
     }
 
     @Override
-    public void draw(GraphicsContext graphicsContext, GISView gisView, boolean isSelected) {
+    public void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected) {
         List<Point> points = GISTools.getScreenPoints(vertices, gisView);
 
-        graphicsContext.setStroke(isSelected ? GISConst.selectedLineColor : GISConst.lineColor);
-        graphicsContext.setLineWidth(GISConst.lineWidth);
+        graphicsContext.setColor(isSelected ? GISConst.selectedLineColor : GISConst.lineColor);
+        graphicsContext.setStroke(new BasicStroke(GISConst.lineWidth));
 
-        double[] polygonsX = new double[points.size()], polygonsY = new double[points.size()];
+        int[] polygonsX = new int[points.size()], polygonsY = new int[points.size()];
         for (int i = 0, size = points.size(); i < size; i++) {
             polygonsX[i] = points.get(i).x;
             polygonsY[i] = points.get(i).y;
         }
-        graphicsContext.strokePolyline(polygonsX, polygonsY, points.size());
+        graphicsContext.drawPolyline(polygonsX, polygonsY, points.size());
     }
 
     public GISVertex fromNode() {

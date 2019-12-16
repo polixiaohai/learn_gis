@@ -46,7 +46,7 @@ public class DataTableController implements Initializable {
             Map<String, Object> map = (Map<String, Object>) item;
             mainController.getLayer().addSelectedFeatureByID(Integer.parseInt(map.get("id").toString()));
         }
-        mainController.updateMap(true);
+        mainController.updateMap();
     }
 
     public void updateData() {

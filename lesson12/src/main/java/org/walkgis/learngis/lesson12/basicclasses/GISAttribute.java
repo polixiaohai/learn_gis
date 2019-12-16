@@ -1,9 +1,5 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -24,11 +20,11 @@ public class GISAttribute {
         return values.get(index);
     }
 
-    public void draw(GraphicsContext graphicsContext, GISView gisView, GISVertex location, int index) {
+    public void draw(Graphics graphicsContext, GISView gisView, GISVertex location, int index) {
         Point screenPoint = gisView.toScreenPoint(location);
-        graphicsContext.setFont(new Font("宋体", 9));
-        graphicsContext.setFill(Color.BLUE);
+        graphicsContext.setFont(new Font("宋体", 0, 9));
+        graphicsContext.setColor(Color.BLUE);
 
-        graphicsContext.fillText(getValue(index).toString(), screenPoint.x, screenPoint.y);
+        graphicsContext.drawString(getValue(index).toString(), screenPoint.x, screenPoint.y);
     }
 }

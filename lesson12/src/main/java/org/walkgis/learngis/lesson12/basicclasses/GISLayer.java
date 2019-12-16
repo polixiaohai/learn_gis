@@ -1,8 +1,6 @@
 package org.walkgis.learngis.lesson12.basicclasses;
 
-
-import javafx.scene.canvas.GraphicsContext;
-
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,20 +22,11 @@ public class GISLayer {
         this.fields = fields;
     }
 
-    public GISLayer(String name, SHAPETYPE shapeType, GISExtent extent) {
-        this.name = name;
-        this.extent = extent;
-        this.shapeType = shapeType;
-        this.fields = new ArrayList<>();
-    }
-
-    public GISLayer() {
-
-    }
-
-    public void draw(GraphicsContext _Graphics, GISView _View) {
+    public void draw(Graphics2D graphics2D, GISView view) {
+        GISExtent extent = view.getRealExtent();
         for (int i = 0; i < features.size(); i++) {
-            features.get(i).draw(_Graphics, _View, drawAttributeOrNot, labelIndex);
+            if (extent.insertectOrNot(features.get(i).spatial.extent))
+                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex);
         }
     }
 
