@@ -131,7 +131,7 @@ public class MainController implements Initializable {
         );
         File file = fileChooser.showOpenDialog(selectFile);
         if (file != null) {
-            document.read(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
+            document.read(file.getAbsolutePath());
             if (!document.isEmpty())
                 updateMap();
         }

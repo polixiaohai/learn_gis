@@ -89,10 +89,10 @@ public class LayerController implements Initializable {
                 new FileChooser.ExtensionFilter("所有文件类型", "*.gis"),
                 new FileChooser.ExtensionFilter("Shapefile", "*.gis")
         );
-        File file = fileChooser.showOpenDialog(selectFile);
+        File file = fileChooser.showSaveDialog(selectFile);
         if (file != null) {
             if (file.exists()) file.delete();
-            mainController.document.write(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
+            mainController.document.write(file.getAbsolutePath());
         }
     }
 

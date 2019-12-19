@@ -4,7 +4,9 @@ import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -85,9 +87,9 @@ public class GISTools {
         return ab.x * bc.x + ab.y * bc.y;
     }
 
-    public static void writeString(String s, DataOutputStream bw) {
+    public static void writeString(String s, RandomAccessFile bw) {
         try {
-            bw.write(stringLength(s));
+            bw.writeInt(stringLength(s));
             byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
             bw.write(bytes);
         } catch (IOException e) {
@@ -95,12 +97,12 @@ public class GISTools {
         }
     }
 
-    public static String readString(DataInputStream br) {
+    public static String readString(RandomAccessFile br) {
         try {
             int length = br.readInt();
             byte[] bytes = new byte[length];
             br.read(bytes);
-            return new String(bytes);
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,7 +113,7 @@ public class GISTools {
         int chineseCount = 0;
         byte[] bs = new byte[0];
 //        bs = s.getBytes(Charset.forName("US-ASCII"));
-        bs = s.getBytes(Charset.forName("UTF-8"));
+        bs = s.getBytes(StandardCharsets.UTF_8);
         for (byte b : bs)
             if (b == 0x3F) chineseCount++;
         return chineseCount + bs.length;

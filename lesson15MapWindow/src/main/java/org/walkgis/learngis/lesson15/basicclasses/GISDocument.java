@@ -2,6 +2,7 @@ package org.walkgis.learngis.lesson15.basicclasses;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -105,41 +106,62 @@ public class GISDocument {
 
     public void read(String documentFilePath) {
         layers.clear();
+        RandomAccessFile randomAccessFile = null;
         try {
-            FileInputStream fsr = new FileInputStream(new File(documentFilePath));
-            DataInputStream bw = new DataInputStream(fsr);
+            randomAccessFile = new RandomAccessFile(new File(documentFilePath), "r");
 
-            String path = GISTools.readString(bw);
-            GISLayer layer = addLayer(path);
-            layer.path = path;
-            layer.drawAttributeOrNot = bw.readBoolean();
-            layer.labelIndex = bw.readInt();
-            layer.selectable = bw.readBoolean();
-            layer.visible = bw.readBoolean();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void write(String documentFilePath) {
-        try {
-            FileOutputStream fsr = new FileOutputStream(new File(documentFilePath));
-            DataOutputStream bw = new DataOutputStream(fsr);
-            for (int i = 0; i < layers.size(); i++) {
-                GISLayer layer = layers.get(i);
-                GISTools.writeString(layer.path, bw);
-                bw.writeBoolean(layer.drawAttributeOrNot);
-                bw.writeInt(layer.labelIndex);
-                bw.writeBoolean(layer.selectable);
-                bw.writeBoolean(layer.visible);
+            randomAccessFile.read();
+            int length = -1;
+            while ((length = randomAccessFile.readInt()) != -1) {
+                byte[] bytes = new byte[length];
+                randomAccessFile.read(bytes);
+                String path = new String(bytes, StandardCharsets.UTF_8);
+                GISLayer layer = addLayer(path);
+                layer.path = path;
+                layer.drawAttributeOrNot = randomAccessFile.readBoolean();
+                layer.labelIndex = randomAccessFile.readInt();
+                layer.selectable = randomAccessFile.readBoolean();
+                layer.visible = randomAccessFile.readBoolean();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (randomAccessFile != null) {
+                try {
+                    randomAccessFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void write(String documentFilePath) {
+        RandomAccessFile randomAccessFile = null;
+        try {
+            randomAccessFile = new RandomAccessFile(new File(documentFilePath), "rw");
+            for (int i = 0; i < layers.size(); i++) {
+                GISLayer layer = layers.get(i);
+                GISTools.writeString(layer.path, randomAccessFile);
+                randomAccessFile.writeBoolean(layer.drawAttributeOrNot);
+                randomAccessFile.writeInt(layer.labelIndex);
+                randomAccessFile.writeBoolean(layer.selectable);
+                randomAccessFile.writeBoolean(layer.visible);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (randomAccessFile != null) {
+                try {
+                    randomAccessFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
