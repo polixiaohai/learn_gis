@@ -15,6 +15,10 @@ public class GISVertex {
         this.y = y;
     }
 
+    public GISVertex(GISVertex vertex) {
+        copyFrom(vertex);
+    }
+
     public double distance(GISVertex anotherVertex) {
         return Math.sqrt((x - anotherVertex.x) * (x - anotherVertex.x) + (y - anotherVertex.y) * (y - anotherVertex.y));
     }

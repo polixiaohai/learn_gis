@@ -2,10 +2,10 @@ package org.walkgis.learngis.lesson14.basicclasses;
 
 public class GISField {
     public Class dataType;
-    public String fileName;
+    public String fieldName;
 
-    public GISField(Class dataType, String fileName) {
+    public GISField(Class dataType, String fieldName) {
         this.dataType = dataType;
-        this.fileName = fileName;
+        this.fieldName = fieldName;
     }
 }

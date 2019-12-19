@@ -81,7 +81,7 @@ public class DataTableController implements Initializable {
             Map<String, Object> map = new HashMap<>();
             map.put("id", feature.id);
             for (int i = 0; i < size; i++) {
-                map.put(layer.fields.get(i).fileName, feature.getAttribute(i));
+                map.put(layer.fields.get(i).fieldName, feature.getAttribute(i));
             }
             objects.add(map);
         });
@@ -101,11 +101,11 @@ public class DataTableController implements Initializable {
         tableColumns.add(firstNameCol);
         layer.fields.forEach(field -> {
             // 每个Table的列
-            TableColumn firstNameCol2 = new TableColumn(field.fileName);
+            TableColumn firstNameCol2 = new TableColumn(field.fieldName);
             // 设置宽度
             //firstNameCol.setMinWidth(100);
             // 设置分箱的类下面的属性名
-            firstNameCol2.setCellValueFactory(new MapValueFactory<>(field.fileName));
+            firstNameCol2.setCellValueFactory(new MapValueFactory<>(field.fieldName));
             tableColumns.add(firstNameCol2);
         });
 

@@ -16,6 +16,11 @@ public class GISExtent {
         this.bottomLeft = new GISVertex(Math.min(x1, x2), Math.min(y1, y2));
     }
 
+    public GISExtent(GISExtent extent) {
+        upRight = new GISVertex(extent.upRight);
+        bottomLeft = new GISVertex(extent.bottomLeft);
+    }
+
     public void changeExtent(GISMapAction action) {
         double newMinX = bottomLeft.x, newMinY = bottomLeft.y, newMaxX = upRight.x, newMaxY = upRight.y;
         switch (action) {
@@ -106,5 +111,12 @@ public class GISExtent {
 
     public boolean include(GISExtent extent) {
         return (getMaxX() >= extent.getMaxX() && getMinX() <= extent.getMinX() && getMaxY() >= extent.getMaxY() && getMinY() <= extent.getMinY());
+    }
+
+    public void merge(GISExtent extent) {
+        upRight.x = Math.max(upRight.x, extent.upRight.x);
+        upRight.y = Math.max(upRight.y, extent.upRight.y);
+        bottomLeft.x = Math.min(bottomLeft.x, extent.bottomLeft.x);
+        bottomLeft.y = Math.min(bottomLeft.y, extent.bottomLeft.y);
     }
 }

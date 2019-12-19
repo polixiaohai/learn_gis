@@ -13,6 +13,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ContextMenuEvent;
@@ -29,8 +30,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 import org.walkgis.learngis.lesson14.Lesson14Application;
 import org.walkgis.learngis.lesson14.basicclasses.*;
-import org.walkgis.learngis.lesson13.view.DataTableView;
-import org.walkgis.learngis.lesson13.view.MainView;
+import org.walkgis.learngis.lesson14.view.DataTableView;
+import org.walkgis.learngis.lesson14.view.LayerView;
+import org.walkgis.learngis.lesson14.view.MainView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -48,15 +50,19 @@ public class MainController implements Initializable {
     @FXML
     private Canvas mainCanvas;
     @FXML
-    private ImageView btnOpenShp, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnAttributeTable, btnClear;
+    private ImageView btnOpenShp, btnLayers, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnAttributeTable, btnClear;
     @FXML
     private Label lblPosition, lblTotals, lblSelectCount;
+    @FXML
+    private TreeView toolContent;
     @Autowired
     private DataTableController dataTableController;
     @Autowired
     private MainView mainView;
+
     private ContextMenu contextMenu;
     private MenuItem select, zoomIn, zoomOut, pan, fullScreen;
+
     @Autowired
     private ApplicationContext applicationContext;
     private BufferedImage backgroundWindow;
@@ -67,11 +73,54 @@ public class MainController implements Initializable {
     private GISView view;
     private GISLayer layer;
     private Rectangle clientRectangle;
+    public GISDocument document;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        contextMenu = new ContextMenu();
+        document = new GISDocument();
+        initCanvasContextMenu();
 
+        clientRectangle = new Rectangle(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
+        view = new GISView(new GISExtent(new GISVertex(0, 0), new GISVertex(1, 1)), clientRectangle);
+        mainCanvas.setOnMouseClicked(this::canvasClick);
+        mainCanvas.setOnMouseMoved(this::canvasMouseMoved);
+        mainCanvas.setOnMousePressed(this::canvasMousePressed);
+        mainCanvas.setOnMouseReleased(this::canvasMouseReleased);
+        mainCanvas.setOnContextMenuRequested(this::canvasContextMenu);
+        btnZoomIn.setOnMouseClicked(this::mapActionClick);
+        btnZoomOut.setOnMouseClicked(this::mapActionClick);
+        btnMoveUp.setOnMouseClicked(this::mapActionClick);
+        btnMoveDown.setOnMouseClicked(this::mapActionClick);
+        btnMoveLeft.setOnMouseClicked(this::mapActionClick);
+        btnMoveRight.setOnMouseClicked(this::mapActionClick);
+        btnOpenShp.setOnMouseClicked(this::btnOpenShpClick);
+        btnFullScreen.setOnMouseClicked(this::btnFullScreen);
+        btnLayers.setOnMouseClicked(this::btnLayersClick);
+        btnAttributeTable.setOnMouseClicked(this::btnAttributeTableClick);
+        btnClear.setOnMouseClicked(this::btnClearClick);
+        mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
+        mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
+    }
+
+    @FXML
+    private void btnLayersClick(MouseEvent e) {
+        AbstractFxmlView view = applicationContext.getBean(LayerView.class);
+        Stage newStage = new Stage();
+        Scene newScene;
+        if (view.getView().getScene() != null) {
+            newScene = view.getView().getScene();
+        } else {
+            newScene = new Scene(view.getView());
+        }
+
+        newStage.setScene(newScene);
+        newStage.initModality(Modality.NONE);
+        newStage.initOwner(Lesson14Application.getStage());
+        newStage.show();
+    }
+
+    private void initCanvasContextMenu() {
+        contextMenu = new ContextMenu();
         select = new MenuItem("select");
         zoomIn = new MenuItem("ZoomIn");
         zoomOut = new MenuItem("zoomOut");
@@ -85,27 +134,6 @@ public class MainController implements Initializable {
         fullScreen.setOnAction(this::contextMenuClick);
 
         contextMenu.getItems().addAll(select, zoomIn, zoomOut, pan, fullScreen);
-
-
-        clientRectangle = new Rectangle(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
-        view = new GISView(new GISExtent(new GISVertex(0, 0), new GISVertex(1, 1)), clientRectangle);
-//        mainCanvas.setOnMouseClicked(this::canvasClick);
-        mainCanvas.setOnMouseMoved(this::canvasMouseMoved);
-        mainCanvas.setOnMousePressed(this::canvasMousePressed);
-        mainCanvas.setOnMouseReleased(this::canvasMouseReleased);
-        mainCanvas.setOnContextMenuRequested(this::canvasContextMenu);
-        btnZoomIn.setOnMouseClicked(this::mapActionClick);
-        btnZoomOut.setOnMouseClicked(this::mapActionClick);
-        btnMoveUp.setOnMouseClicked(this::mapActionClick);
-        btnMoveDown.setOnMouseClicked(this::mapActionClick);
-        btnMoveLeft.setOnMouseClicked(this::mapActionClick);
-        btnMoveRight.setOnMouseClicked(this::mapActionClick);
-        btnOpenShp.setOnMouseClicked(this::btnOpenShpClick);
-        btnFullScreen.setOnMouseClicked(this::btnFullScreen);
-        btnAttributeTable.setOnMouseClicked(this::btnAttributeTableClick);
-        btnClear.setOnMouseClicked(this::btnClearClick);
-        mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
-        mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
     }
 
     @FXML
@@ -135,7 +163,6 @@ public class MainController implements Initializable {
     private void canvasContextMenu(ContextMenuEvent contextMenuEvent) {
         contextMenu.show(mainCanvas, contextMenuEvent.getScreenX(), contextMenuEvent.getScreenY());
     }
-
 
     @FXML
     private void canvasMouseReleased(MouseEvent mouseEvent) {
@@ -287,6 +314,7 @@ public class MainController implements Initializable {
         if (file != null) {
             layer = gisShapefile.readShapefile(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
             layer.drawAttributeOrNot = true;
+            document.layers.add(layer);
             lblTotals.setText("总共：" + layer.featureCount() + "个要素");
             view.updateExtent(layer.extent);
             updateMap();

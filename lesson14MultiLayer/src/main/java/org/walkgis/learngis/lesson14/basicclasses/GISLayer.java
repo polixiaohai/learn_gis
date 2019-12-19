@@ -1,6 +1,7 @@
 package org.walkgis.learngis.lesson14.basicclasses;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,9 @@ public class GISLayer {
     public String name;
     public GISExtent extent;
     public Boolean drawAttributeOrNot = true;
+    public boolean selectable = true;
+    public boolean visible = true;
+    public String path = "";
     public int labelIndex = 2;
     public SHAPETYPE shapeType;
     public List<GISField> fields;
@@ -15,8 +19,9 @@ public class GISLayer {
     public List<GISFeature> selection = new ArrayList<>();
 
 
-    public GISLayer(String name, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields) {
-        this.name = name;
+    public GISLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields) {
+        this.name = new File(shpFilePath).getName();
+        this.path = shpFilePath;
         this.extent = extent;
         this.shapeType = shapeType;
         this.fields = fields;
@@ -29,6 +34,13 @@ public class GISLayer {
                 features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex);
         }
     }
+    public void draw(Graphics2D graphics2D, GISView view, GISExtent displayExtent) {
+        for (int i = 0; i < features.size(); i++) {
+            if (displayExtent.insertectOrNot(features.get(i).spatial.extent))
+                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex);
+        }
+    }
+
 
     public SelectResult select(GISVertex vertex, GISView view) {
         GISSelect select = new GISSelect();
