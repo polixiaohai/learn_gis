@@ -51,7 +51,7 @@ public class MainController implements Initializable {
     @FXML
     private ImageView btnOpenShp, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnAttributeTable, btnClear;
     @FXML
-    private Label lblPosition, lblCount;
+    private Label lblPosition, lblTotals, lblSelectCount;
     @Autowired
     private DataTableController dataTableController;
     @Autowired
@@ -175,12 +175,12 @@ public class MainController implements Initializable {
                 break;
             case ZoomOut:
                 if (mouseEvent.getX() == mouseStartX && mouseEvent.getY() == mouseStartY) {
+                    GISExtent e1 = view.getRealExtent();
                     GISVertex mouseLocation = view.toMapVertex(new Point((int) mouseEvent.getX(), (int) mouseEvent.getY()));
-                    GISExtent extent = view.getRealExtent();
-                    double newWidth = extent.getWidth() * GISConst.zoomOutFactor;
-                    double newHeight = extent.getHeight() * GISConst.zoomOutFactor;
-                    double newMinx = mouseLocation.x - (mouseLocation.x - extent.getMinX()) * GISConst.zoomOutFactor;
-                    double newMiny = mouseLocation.y - (mouseLocation.y - extent.getMinY()) * GISConst.zoomOutFactor;
+                    double newWidth = e1.getWidth() / GISConst.zoomOutFactor;
+                    double newHeight = e1.getHeight() / GISConst.zoomOutFactor;
+                    double newMinx = mouseLocation.x - (mouseLocation.x - e1.getMinX()) / GISConst.zoomOutFactor;
+                    double newMiny = mouseLocation.y - (mouseLocation.y - e1.getMinY()) / GISConst.zoomOutFactor;
                     view.updateExtent(new GISExtent(newMinx, newMinx + newWidth, newMiny, newMiny + newHeight));
                 } else {
                     GISExtent e3 = view.rectToExtent((int) mouseEvent.getX(), mouseStartX, (int) mouseEvent.getY(), mouseStartY);
@@ -233,7 +233,7 @@ public class MainController implements Initializable {
         layer.clearSelection();
         updateMap();
         //更新状态栏
-        lblCount.setText("当前选中：0");
+        lblSelectCount.setText("当前选中：0");
         updateAttributeWindow();
     }
 
@@ -288,12 +288,7 @@ public class MainController implements Initializable {
         if (file != null) {
             layer = gisShapefile.readShapefile(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
             layer.drawAttributeOrNot = true;
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("信息框");
-            alert.setHeaderText("打开成功");
-            alert.setContentText("read" + layer.featureCount() + " features");
-            alert.showAndWait();
-
+            lblTotals.setText("总共：" + layer.featureCount() + "个要素");
             view.updateExtent(layer.extent);
             updateMap();
         }
@@ -329,7 +324,7 @@ public class MainController implements Initializable {
         WritableImage image = SwingFXUtils.toFXImage(backgroundWindow, null);
 
         mainCanvas.getGraphicsContext2D().drawImage(image, 0, 0);
-        lblCount.setText("当前选中：" + layer.selection.size());
+        lblSelectCount.setText("当前选中：" + layer.selection.size());
     }
 
     @FXML
