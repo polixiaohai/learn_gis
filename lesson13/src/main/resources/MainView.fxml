@@ -1,24 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson13.controller.MainController">
-    <children>
-        <Canvas fx:id="mainCanvas" height="600.0" layoutX="6.0" width="600.0"/>
-        <Button fx:id="btnZoomIn" layoutX="169.0" layoutY="14.0" mnemonicParsing="false" text="放大"/>
-        <Button fx:id="btnZoomOut" layoutX="217.0" layoutY="14.0" mnemonicParsing="false" text="缩小"/>
-        <Button fx:id="btnMoveUp" layoutX="271.0" layoutY="14.0" mnemonicParsing="false" text="上移"/>
-        <Button fx:id="btnMoveDown" layoutX="325.0" layoutY="14.0" mnemonicParsing="false" text="下移"/>
-        <Button fx:id="btnMoveLeft" layoutX="376.0" layoutY="14.0" mnemonicParsing="false" text="左移"/>
-        <Button fx:id="btnMoveRight" layoutX="429.0" layoutY="14.0" mnemonicParsing="false" text="右移"/>
-        <Button fx:id="btnOpenShp" layoutX="26.0" layoutY="14.0" mnemonicParsing="false" text="打开Shp"/>
-        <Button fx:id="btnFullScreen" layoutX="104.0" layoutY="14.0" mnemonicParsing="false" text="全图"/>
-        <Button fx:id="btnAttributeTable" layoutX="486.0" layoutY="14.0" mnemonicParsing="false" text="属性表"/>
-        <Label fx:id="lblPosition" layoutX="384.0" layoutY="571.0" prefHeight="15.0" prefWidth="186.0" text=""/>
-        <Button fx:id="btnClear" layoutX="543.0" layoutY="14.0" mnemonicParsing="false" text="清空"/>
-        <Label fx:id="lblCount" layoutX="11.0" layoutY="571.0" text=""/>
-    </children>
-</AnchorPane>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson13.controller.MainController">
+   <center>
+      <Pane fx:id="canvasContainer" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: #ffffff;">
+         <children>
+              <Canvas fx:id="mainCanvas" height="600.0" width="600.0" />
+         </children>
+      </Pane>
+   </center>
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+              <MenuBar>
+                  <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                          <items>
+                              <MenuItem mnemonicParsing="false" text="Close" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Edit">
+                          <items>
+                              <MenuItem mnemonicParsing="false" text="Delete" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                          <items>
+                              <MenuItem mnemonicParsing="false" text="About" />
+                          </items>
+                      </Menu>
+                  </menus>
+              </MenuBar>
+              <ToolBar VBox.vgrow="ALWAYS">
+                  <items>
+                      <ImageView fx:id="btnOpenShp">
+                     <image>
+                        <Image url="@img/open.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnFullScreen">
+                     <image>
+                        <Image url="@img/fullscreen.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnZoomIn">
+                     <image>
+                        <Image url="@img/zoomin.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnZoomOut">
+                     <image>
+                        <Image url="@img/zoomout.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnMoveUp">
+                     <image>
+                        <Image url="@img/moveup.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnMoveDown">
+                     <image>
+                        <Image url="@img/movedown.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnMoveLeft">
+                     <image>
+                        <Image url="@img/moveleft.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnMoveRight">
+                     <image>
+                        <Image url="@img/moveright.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnAttributeTable">
+                     <image>
+                        <Image url="@img/attribute.png" />
+                     </image>
+                  </ImageView>
+                      <ImageView fx:id="btnClear">
+                     <image>
+                        <Image url="@img/clear.png" />
+                     </image>
+                  </ImageView>
+                  </items>
+              </ToolBar>
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <ToolBar BorderPane.alignment="CENTER">
+         <items>
+                <Label fx:id="lblCount" mnemonicParsing="false" text="" />
+                <Label fx:id="lblPosition" mnemonicParsing="false" text="" />
+         </items>
+      </ToolBar>
+   </bottom>
+</BorderPane>

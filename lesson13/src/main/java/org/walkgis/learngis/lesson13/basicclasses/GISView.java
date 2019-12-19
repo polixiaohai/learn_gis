@@ -82,6 +82,12 @@ public class GISView {
     }
 
     public GISExtent getRealExtent() {
-        return new GISExtent(mapMinX, mapMinX + mapW, mapMinY ,mapMinY + mapH);
+        return new GISExtent(mapMinX, mapMinX + mapW, mapMinY, mapMinY + mapH);
+    }
+
+    public GISExtent rectToExtent(int x1, int x2, int y1, int y2) {
+        GISVertex v1 = toMapVertex(new Point(x1, y1));
+        GISVertex v2 = toMapVertex(new Point(x2, y2));
+        return new GISExtent(v1.x, v2.x, v1.y, v2.y);
     }
 }

@@ -13,6 +13,7 @@ public class Lesson13Application extends AbstractJavaFxApplicationSupport {
         launch(Lesson13Application.class, MainView.class, new InitSplash(), args);
     }
 
+
     @Override
     public void beforeInitialView(Stage stage, ConfigurableApplicationContext ctx) {
         stage.setTitle("地图切片");

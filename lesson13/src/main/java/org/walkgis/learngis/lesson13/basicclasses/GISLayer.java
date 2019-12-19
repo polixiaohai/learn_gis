@@ -45,6 +45,21 @@ public class GISLayer {
         return selectResult;
     }
 
+    public SelectResult select(GISExtent extent) {
+        GISSelect select = new GISSelect();
+        SelectResult selectResult = select.select(extent, features);
+        if (selectResult == SelectResult.OK) {
+            for (int i = 0; i < select.selectedFeatures.size(); i++) {
+                if (!select.selectedFeatures.get(i).isSelected) {
+                    select.selectedFeatures.get(i).isSelected = true;
+                    selection.add(select.selectedFeatures.get(i));
+                }
+            }
+        }
+
+        return selectResult;
+    }
+
     public void clearSelection() {
         selection.stream().forEach(sel -> sel.isSelected = false);
         selection.clear();

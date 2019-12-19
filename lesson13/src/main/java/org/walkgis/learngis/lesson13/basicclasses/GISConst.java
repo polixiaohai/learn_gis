@@ -22,4 +22,8 @@ public class GISConst {
     public static Color selectedLineColor = Color.CYAN;
     //被选中的面的线颜色
     public static Color selectedPolygonBoundaryColor = Color.CYAN;
+    //地图放大系数
+    public static double zoomInFactor = 0.8;
+    //地图缩小系数
+    public static double zoomOutFactor = 0.8;
 }

@@ -24,6 +24,17 @@ public class GISSelect {
         return SelectResult.UnknownType;
     }
 
+    public SelectResult select(GISExtent extent, List<GISFeature> features) {
+        if (features.size() == 0) return SelectResult.EmptySet;
+        selectedFeatures.clear();
+        for (int i = 0, size = features.size(); i < size; i++) {
+            if (extent.include(features.get(i).spatial.extent)) {
+                selectedFeatures.add(features.get(i));
+            }
+        }
+        return (selectedFeatures.size() > 0) ? SelectResult.OK : SelectResult.TooFar;
+    }
+
     private SelectResult selectPolygon(GISVertex vertex, List<GISFeature> features, GISView view, GISExtent minExtent) {
         selectedFeatures.clear();
         for (int i = 0; i < features.size(); i++) {
@@ -113,4 +124,6 @@ public class GISSelect {
         GISVertex g2 = view.toMapVertex(p2);
         return new GISExtent(g1.x, g2.x, g1.y, g2.y);
     }
+
+
 }

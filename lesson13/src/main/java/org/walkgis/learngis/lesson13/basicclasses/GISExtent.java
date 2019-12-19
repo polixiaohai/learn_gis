@@ -103,4 +103,8 @@ public class GISExtent {
     public GISVertex getCenter() {
         return new GISVertex((upRight.x + bottomLeft.x) / 2, (upRight.y + bottomLeft.y) / 2);
     }
+
+    public boolean include(GISExtent extent) {
+        return (getMaxX() >= extent.getMaxX() && getMinX() <= extent.getMinX() && getMaxY() >= extent.getMaxY() && getMinY() <= extent.getMinY());
+    }
 }

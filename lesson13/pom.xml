@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.walkgis.learngis</groupId>
-    <artifactId>lesson12</artifactId>
+    <artifactId>lesson13</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>lesson12</name>
     <description>Demo project for Spring Boot</description>
@@ -42,4 +42,11 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>nexus-aliyun</id>
+            <name>Nexus aliyun</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
 </project>
