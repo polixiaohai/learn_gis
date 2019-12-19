@@ -102,7 +102,8 @@
    <bottom>
       <ToolBar BorderPane.alignment="CENTER">
          <items>
-                <Label fx:id="lblCount" mnemonicParsing="false" text="" />
+                <Label fx:id="lblTotals" mnemonicParsing="false" text="" />
+                <Label fx:id="lblSelectCount" mnemonicParsing="false" text="" />
                 <Label fx:id="lblPosition" mnemonicParsing="false" text="" />
          </items>
       </ToolBar>
