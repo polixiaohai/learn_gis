@@ -11,7 +11,7 @@
     <groupId>org.walkgis.learngis</groupId>
     <artifactId>lesson13</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>lesson12</name>
+    <name>lesson13</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
