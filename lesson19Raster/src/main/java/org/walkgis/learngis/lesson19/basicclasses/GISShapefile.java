@@ -114,10 +114,10 @@ public class GISShapefile {
         return Utils.bytes2Int(bigbytes, 0);
     }
 
-    public GISLayer readShapefile(String shpfilename) {
+    public GISVectorLayer readShapefile(String shpfilename) {
         //打开文件和读取工具
         FileInputStream fsr = null;
-        GISLayer layer = null;
+        GISVectorLayer layer = null;
         try {
             fsr = new FileInputStream(shpfilename + ".shp");
             DBFReader dbfReader = new DBFReader(new FileInputStream(shpfilename + ".dbf"), Charset.forName("UTF-8"));
@@ -131,7 +131,7 @@ public class GISShapefile {
             //获得空间范围
             GISExtent extent = new GISExtent(new GISVertex(sfh.Xmin, sfh.Ymin), new GISVertex(sfh.Xmax, sfh.Ymax));
             //初始化图层
-            layer = new GISLayer(shpfilename, ShapeType, extent, getFields(dbfReader));
+            layer = new GISVectorLayer(shpfilename, ShapeType, extent, getFields(dbfReader));
             Object[] rowValues;
             while (br.available() > 0 && ((rowValues = dbfReader.nextRecord()) != null)) {
                 //读记录头
@@ -146,7 +146,7 @@ public class GISShapefile {
                     layer.addFeature(onefeature);
                 } else if (ShapeType == SHAPETYPE.polyline) {
                     List<GISPolyline> lines = readLines(recordContent);
-                    GISLayer finalLayer = layer;
+                    GISVectorLayer finalLayer = layer;
                     Object[] finalRowValues = rowValues;
                     lines.forEach(line -> {
                         GISFeature onefeature = new GISFeature(line, new GISAttribute(finalRowValues));
@@ -154,7 +154,7 @@ public class GISShapefile {
                     });
                 } else if (ShapeType == SHAPETYPE.polygon) {
                     List<GISPolygon> polygons = readPolygons(recordContent);
-                    GISLayer finalLayer1 = layer;
+                    GISVectorLayer finalLayer1 = layer;
                     Object[] finalRowValues1 = rowValues;
                     polygons.forEach(polygon -> {
                         GISFeature onefeature = new GISFeature(polygon, new GISAttribute(finalRowValues1));

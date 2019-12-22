@@ -19,7 +19,11 @@ public class GISDocument {
     }
 
     public GISLayer addLayer(String absolutePath) {
-        GISLayer layer = new GISShapefile().readShapefile(absolutePath);
+        GISLayer layer = null;
+        String fileType = "";
+        if (fileType.equalsIgnoreCase(".gis")) {
+            layer = new GISShapefile().readShapefile(absolutePath);
+        } else layer = new GISRasterLayer(absolutePath);
         layer.path = absolutePath;
         getUniqueName(layer);
         layers.add(layer);
@@ -76,15 +80,23 @@ public class GISDocument {
     }
 
     public void clearSelection() {
-        layers.forEach(lyr -> lyr.clearSelection());
+        layers.forEach(lyr -> {
+            if (lyr.layerType == LAYERTYPE.VectorLayer)
+                ((GISVectorLayer) lyr).clearSelection();
+        });
     }
 
     public SelectResult select(GISVertex v, GISView view) {
         SelectResult sr = SelectResult.TooFar;
         for (int i = 0; i < layers.size(); i++) {
-            if (layers.get(i).selectable) {
-                if (layers.get(i).select(v, view) == SelectResult.OK) {
-                    sr = SelectResult.OK;
+            GISLayer lyr = layers.get(i);
+            if (lyr.layerType == LAYERTYPE.VectorLayer) {
+                GISVectorLayer layer = (GISVectorLayer) lyr;
+                layer.clearSelection();
+                if (layer.selectable) {
+                    if (layer.select(v, view) == SelectResult.OK) {
+                        sr = SelectResult.OK;
+                    }
                 }
             }
         }
@@ -94,9 +106,13 @@ public class GISDocument {
     public SelectResult select(GISExtent extent) {
         SelectResult sr = SelectResult.TooFar;
         for (int i = 0; i < layers.size(); i++) {
-            if (layers.get(i).selectable) {
-                if (layers.get(i).select(extent) == SelectResult.OK) {
-                    sr = SelectResult.OK;
+            GISLayer lyr = layers.get(i);
+            if (lyr.layerType == LAYERTYPE.VectorLayer) {
+                GISVectorLayer layer = (GISVectorLayer) lyr;
+                if (layer.selectable) {
+                    if (layer.select(extent) == SelectResult.OK) {
+                        sr = SelectResult.OK;
+                    }
                 }
             }
         }
