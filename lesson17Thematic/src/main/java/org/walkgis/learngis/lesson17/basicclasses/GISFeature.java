@@ -1,7 +1,5 @@
 package org.walkgis.learngis.lesson17.basicclasses;
 
-import javafx.scene.canvas.GraphicsContext;
-
 import java.awt.*;
 
 public class GISFeature {
@@ -15,8 +13,8 @@ public class GISFeature {
         this.attribute = attribute;
     }
 
-    public void draw(Graphics2D graphicsContext, GISView gisView, boolean drawAttributeOrNot, int index) {
-        spatial.draw(graphicsContext, gisView, isSelected);
+    public void draw(Graphics2D graphicsContext, GISView gisView, boolean drawAttributeOrNot, int index, GISThematic thematic) {
+        spatial.draw(graphicsContext, gisView, isSelected, thematic);
         if (drawAttributeOrNot) {
             attribute.draw(graphicsContext, gisView, spatial.center, index);
         }

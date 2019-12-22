@@ -14,20 +14,6 @@ public class GISPolyline extends GISSpatial {
         this.extent = GISTools.calculateExtent(vertices);
     }
 
-    @Override
-    public void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected) {
-        List<Point> points = GISTools.getScreenPoints(vertices, gisView);
-
-        graphicsContext.setColor(isSelected ? GISConst.selectedLineColor : GISConst.lineColor);
-        graphicsContext.setStroke(new BasicStroke(GISConst.lineWidth));
-
-        int[] polygonsX = new int[points.size()], polygonsY = new int[points.size()];
-        for (int i = 0, size = points.size(); i < size; i++) {
-            polygonsX[i] = points.get(i).x;
-            polygonsY[i] = points.get(i).y;
-        }
-        graphicsContext.drawPolyline(polygonsX, polygonsY, points.size());
-    }
 
     public GISVertex fromNode() {
         if (vertices.size() == 0) return null;
@@ -45,5 +31,20 @@ public class GISPolyline extends GISSpatial {
             dis = Math.min(GISTools.pointToSegment(vertices.get(i), vertices.get(i + 1), vertex), dis);
         }
         return dis;
+    }
+
+    @Override
+    public void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected, GISThematic thematic) {
+        List<Point> points = GISTools.getScreenPoints(vertices, gisView);
+
+        graphicsContext.setColor(isSelected ? GISConst.selectedLineColor : thematic.insideColor);
+        graphicsContext.setStroke(new BasicStroke(thematic.size));
+
+        int[] polygonsX = new int[points.size()], polygonsY = new int[points.size()];
+        for (int i = 0, size = points.size(); i < size; i++) {
+            polygonsX[i] = points.get(i).x;
+            polygonsY[i] = points.get(i).y;
+        }
+        graphicsContext.drawPolyline(polygonsX, polygonsY, points.size());
     }
 }

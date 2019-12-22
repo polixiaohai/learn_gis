@@ -15,10 +15,10 @@ public class GISPolygon extends GISSpatial {
     }
 
     @Override
-    public void draw(Graphics2D graphicsContext, GISView view, boolean isSelected) {
+    public void draw(Graphics2D graphicsContext, GISView view, boolean isSelected,GISThematic thematic) {
         List<Point> points = GISTools.getScreenPoints(vertexs, view);
 
-        graphicsContext.setColor(GISConst.polygonFillColor);
+        graphicsContext.setColor(thematic.insideColor);
         int[] polygonsX = new int[points.size()], polygonsY = new int[points.size()];
         for (int i = 0, size = points.size(); i < size; i++) {
             polygonsX[i] = points.get(i).x;
@@ -26,8 +26,8 @@ public class GISPolygon extends GISSpatial {
         }
         graphicsContext.fillPolygon(polygonsX, polygonsY, points.size());
 
-        graphicsContext.setColor(isSelected ? GISConst.selectedPolygonBoundaryColor : GISConst.polygonBoundaryColor);
-        graphicsContext.setStroke(new BasicStroke(GISConst.polygonBoundaryWidth));
+        graphicsContext.setColor(isSelected ? GISConst.selectedPolygonBoundaryColor : thematic.outsideColor);
+        graphicsContext.setStroke(new BasicStroke(thematic.size));
         graphicsContext.drawPolygon(polygonsX, polygonsY, points.size());
     }
 

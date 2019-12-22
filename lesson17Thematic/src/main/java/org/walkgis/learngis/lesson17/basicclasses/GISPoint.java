@@ -13,13 +13,13 @@ public class GISPoint extends GISSpatial {
     }
 
     @Override
-    public void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected) {
+    public void draw(Graphics2D graphicsContext, GISView gisView, boolean isSelected, GISThematic thematic) {
         Point screenPoint = gisView.toScreenPoint(center);
-        graphicsContext.setColor(isSelected ? GISConst.selectedPointColor : GISConst.pointColor);
+        graphicsContext.setColor(isSelected ? GISConst.selectedPointColor : thematic.insideColor);
         graphicsContext.fillArc(
-                screenPoint.x - GISConst.pointSize,
-                screenPoint.y - GISConst.pointSize,
-                GISConst.pointSize * 2,
-                GISConst.pointSize * 2, 0, 360);
+                screenPoint.x - thematic.size,
+                screenPoint.y - thematic.size,
+                thematic.size * 2,
+                thematic.size * 2, 0, 360);
     }
 }

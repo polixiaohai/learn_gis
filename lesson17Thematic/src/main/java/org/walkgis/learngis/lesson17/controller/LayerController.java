@@ -2,10 +2,14 @@ package org.walkgis.learngis.lesson17.controller;
 
 import de.felixroske.jfxsupport.FXMLController;
 import de.felixroske.jfxsupport.GUIState;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.walkgis.learngis.lesson17.basicclasses.GISDocument;
 import org.walkgis.learngis.lesson17.basicclasses.GISLayer;
+import org.walkgis.learngis.lesson17.basicclasses.GISTools;
 import org.walkgis.learngis.lesson17.view.LayerView;
 
 import java.io.File;
@@ -33,7 +38,9 @@ public class LayerController implements Initializable {
     @FXML
     private ChoiceBox cmbFields;
     @FXML
-    private TextField txtFilePath, txtLayerName;
+    private TextField txtFilePath, txtLayerName, txtWidth;
+    @FXML
+    private ColorPicker colorOutside, colorInside;
     @FXML
     private Button btnApply, btnClose, btnModify;
     @Autowired
@@ -60,6 +67,14 @@ public class LayerController implements Initializable {
             cmbFields.getSelectionModel().select(layer.labelIndex);
             txtFilePath.setText(layer.path);
             txtLayerName.setText(layer.name);
+
+            txtWidth.setText(String.valueOf(layer.thematic.size));
+            colorInside.setValue(GISTools.awtToJavafx(layer.thematic.outsideColor));
+            colorOutside.setValue(GISTools.awtToJavafx(layer.thematic.insideColor));
+
+            txtWidth.textProperty().addListener((observable1, oldValue1, newValue1) -> {
+                clicked(null);
+            });
         });
         btnModify.setOnMouseClicked(this::btnModifyClick);
         btnAddLayer.setOnMouseClicked(this::btnAddLayerClick);
@@ -71,9 +86,34 @@ public class LayerController implements Initializable {
         btnClose.setOnMouseClicked(this::btnCloseClick);
         btnSaveDocument.setOnMouseClicked(this::btnSaveDocumentClick);
 
+        chbAutoLabel.setOnMouseClicked(this::clicked);
+        chbIsSelect.setOnMouseClicked(this::clicked);
+        chbIsVisible.setOnMouseClicked(this::clicked);
+        cmbFields.getSelectionModel().selectedIndexProperty().addListener(this::cmbFildsSelectedChange);
+
         for (int i = 0, size = mainController.document.layers.size(); i < size; i++)
             layerList.getItems().add(i, mainController.document.layers.get(i).name);
         if (mainController.document.layers.size() > 0) layerList.getSelectionModel().select(0);
+    }
+
+    @FXML
+    private void cmbFildsSelectedChange(Observable observable) {
+        clicked(null);
+    }
+
+    @FXML
+    private void clicked(MouseEvent mouseEvent) {
+        if (layerList.getSelectionModel().getSelectedItems().size() == 0) return;
+        GISLayer layer = mainController.document.getLayer(layerList.getSelectionModel().getSelectedItem().toString());
+        if (layer == null) return;
+        layer.drawAttributeOrNot = chbAutoLabel.isSelected();
+        layer.selectable = chbIsSelect.isSelected();
+        layer.labelIndex = cmbFields.getSelectionModel().getSelectedIndex();
+        layer.visible = chbIsVisible.isSelected();
+
+        layer.thematic.insideColor = GISTools.javaFxToawt(colorInside.getValue());
+        layer.thematic.outsideColor = GISTools.javaFxToawt(colorOutside.getValue());
+        layer.thematic.size = StringUtils.isEmpty(txtWidth.getText()) ? layer.thematic.size : Integer.parseInt(txtWidth.getText());
     }
 
     @FXML

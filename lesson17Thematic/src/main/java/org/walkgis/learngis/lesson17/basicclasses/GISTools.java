@@ -8,10 +8,13 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class GISTools {
+    private static Random random = new Random();
+
     public static List<Point> getScreenPoints(List<GISVertex> vertices, GISView view) {
         return vertices.stream().map(vertex -> view.toScreenPoint(vertex)).collect(Collectors.toList());
     }
@@ -90,7 +93,7 @@ public class GISTools {
     public static void writeString(String s, RandomAccessFile bw) {
         try {
             bw.writeInt(stringLength(s));
-            byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
+            byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
             bw.write(bytes);
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,7 +115,6 @@ public class GISTools {
     private static int stringLength(String s) {
         int chineseCount = 0;
         byte[] bs = new byte[0];
-//        bs = s.getBytes(Charset.forName("US-ASCII"));
         bs = s.getBytes(StandardCharsets.UTF_8);
         for (byte b : bs)
             if (b == 0x3F) chineseCount++;
@@ -120,4 +122,15 @@ public class GISTools {
     }
 
 
+    public static Color getRandomColor() {
+        return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+    }
+
+    public static javafx.scene.paint.Color awtToJavafx(Color outsideColor) {
+        return new javafx.scene.paint.Color(outsideColor.getRed() / 255.0, outsideColor.getGreen() / 255.0, outsideColor.getBlue() / 255.0, outsideColor.getAlpha() / 255.0);
+    }
+
+    public static Color javaFxToawt(javafx.scene.paint.Color value) {
+        return new Color((int) (value.getRed() * 255), (int) (value.getGreen() * 255), (int) (value.getBlue() * 255), (int) (value.getOpacity() * 255));
+    }
 }

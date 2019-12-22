@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GISLayer {
+    public GISThematic thematic;
     public String name;
     public GISExtent extent;
     public Boolean drawAttributeOrNot = true;
@@ -24,19 +25,30 @@ public class GISLayer {
         this.extent = extent;
         this.shapeType = shapeType;
         this.fields = fields;
+        this.thematic = new GISThematic(shapeType);
+    }
+
+    public GISLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent) {
+        this.name = new File(shpFilePath).getName();
+        this.path = shpFilePath;
+        this.extent = extent;
+        this.shapeType = shapeType;
+        this.fields = new ArrayList<>();
+        this.thematic = new GISThematic(shapeType);
     }
 
     public void draw(Graphics2D graphics2D, GISView view) {
         GISExtent extent = view.getRealExtent();
         for (int i = 0; i < features.size(); i++) {
             if (extent.insertectOrNot(features.get(i).spatial.extent))
-                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex);
+                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex, thematic);
         }
     }
+
     public void draw(Graphics2D graphics2D, GISView view, GISExtent displayExtent) {
         for (int i = 0; i < features.size(); i++) {
             if (displayExtent.insertectOrNot(features.get(i).spatial.extent))
-                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex);
+                features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex, thematic);
         }
     }
 

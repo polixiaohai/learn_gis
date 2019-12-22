@@ -109,15 +109,16 @@ public class GISDocument {
         RandomAccessFile randomAccessFile = null;
         try {
             randomAccessFile = new RandomAccessFile(new File(documentFilePath), "r");
-
-            randomAccessFile.read();
             int length = -1;
+
             while ((length = randomAccessFile.readInt()) != -1) {
+                if (length == -1) break;
                 byte[] bytes = new byte[length];
                 randomAccessFile.read(bytes);
                 String path = new String(bytes, StandardCharsets.UTF_8);
                 GISLayer layer = addLayer(path);
                 layer.path = path;
+                layer.name = new File(path).getName();
                 layer.drawAttributeOrNot = randomAccessFile.readBoolean();
                 layer.labelIndex = randomAccessFile.readInt();
                 layer.selectable = randomAccessFile.readBoolean();
@@ -150,6 +151,7 @@ public class GISDocument {
                 randomAccessFile.writeBoolean(layer.selectable);
                 randomAccessFile.writeBoolean(layer.visible);
             }
+            randomAccessFile.writeInt(-1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

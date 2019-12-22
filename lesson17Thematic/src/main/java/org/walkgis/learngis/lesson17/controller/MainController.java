@@ -121,7 +121,7 @@ public class MainController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("选择数据");
         Stage selectFile = new Stage();
-        if (StringUtils.isEmpty(dataDir))
+        if (StringUtils.isEmpty(dataDir) || !new File(dataDir).exists())
             dataDir = System.getProperty("user.home");
         fileChooser.setInitialDirectory(new File(dataDir));
 
