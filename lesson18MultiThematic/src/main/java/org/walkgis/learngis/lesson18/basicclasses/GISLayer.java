@@ -1,7 +1,5 @@
 package org.walkgis.learngis.lesson18.basicclasses;
 
-import javafx.beans.property.DoubleProperty;
-
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -10,7 +8,7 @@ import java.util.List;
 
 public class GISLayer {
     public THEMATICTYPE thematictype;
-    public HashMap<Object, GISThematic> thematics;
+    public HashMap<Object, GISThematic> thematics = new HashMap<>();
     public int thematicIndex;
     public String name;
     public GISExtent extent;
@@ -18,7 +16,7 @@ public class GISLayer {
     public boolean selectable = true;
     public boolean visible = true;
     public String path = "";
-    public int labelIndex = 2;
+    public int labelIndex = 0;
     public SHAPETYPE shapeType;
     public List<GISField> fields;
     public List<GISFeature> features = new ArrayList<GISFeature>();

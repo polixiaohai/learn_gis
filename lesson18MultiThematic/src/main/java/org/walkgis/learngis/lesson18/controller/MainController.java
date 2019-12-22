@@ -338,7 +338,7 @@ public class MainController implements Initializable {
         document.draw(graphics, view);
 
         WritableImage image = SwingFXUtils.toFXImage(backgroundWindow, null);
-
+        mainCanvas.getGraphicsContext2D().clearRect(0, 0, clientRectangle.getWidth(), clientRectangle.getHeight());
         mainCanvas.getGraphicsContext2D().drawImage(image, 0, 0);
         lblSelectCount.setText("总共有图层：" + document.layers.size());
     }

@@ -65,6 +65,10 @@ public class LayerController implements Initializable {
         btnSaveDocument.setOnMouseClicked(this::btnSaveDocumentClick);
         btnThematicApply.setOnMouseClicked(this::btnThematicApplyClick);
 
+        cmbTheamticTypes.getItems().add(0, "唯一值专题图");
+        cmbTheamticTypes.getItems().add(1, "独立值专题图");
+        cmbTheamticTypes.getItems().add(2, "分级设色专题图");
+
         cmbTheamticTypes.getSelectionModel().selectedItemProperty().addListener(this::cmbThematicTypesChange);
 
         for (int i = 0, size = mainController.document.layers.size(); i < size; i++)
@@ -81,7 +85,7 @@ public class LayerController implements Initializable {
         int index = cmbTheamticTypes.getSelectionModel().getSelectedIndex();
         if (index == 0) {
             layer.makeUnifiedValueMap();
-            GISThematic thematic = layer.thematics.get(layer.thematicIndex);
+            GISThematic thematic = layer.thematics.get(layer.thematictype);
             thematic.insideColor = GISTools.javaFxToawt(colorInside.getValue());
             thematic.outsideColor = GISTools.javaFxToawt(colorOutside.getValue());
             thematic.size = StringUtils.isEmpty(txtWidth.getText()) ? thematic.size : Integer.parseInt(txtWidth.getText());
@@ -97,6 +101,7 @@ public class LayerController implements Initializable {
                 return;
             }
         }
+        mainController.updateMap();
     }
 
     @FXML
@@ -181,8 +186,6 @@ public class LayerController implements Initializable {
         layer.selectable = chbIsSelect.isSelected();
         layer.labelIndex = cmbFields.getSelectionModel().getSelectedIndex();
         layer.visible = chbIsVisible.isSelected();
-
-        mainController.updateMap();
     }
 
     @FXML

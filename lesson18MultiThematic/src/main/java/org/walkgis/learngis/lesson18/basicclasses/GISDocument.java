@@ -69,7 +69,6 @@ public class GISDocument {
         int index2 = layers.indexOf(layer2);
         layers.set(index1, layer2);
         layers.set(index2, layer1);
-
     }
 
     public boolean isEmpty() {
