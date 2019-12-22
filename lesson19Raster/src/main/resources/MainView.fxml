@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson19.controller.MainController">
+    <center>
+        <Pane fx:id="canvasContainer" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: #ffffff;">
+            <children>
+                <Canvas fx:id="mainCanvas" height="600.0" width="600.0" />
+            </children>
+        </Pane>
+    </center>
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <MenuBar>
+                    <menus>
+                        <Menu mnemonicParsing="false" text="File">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Close" />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Edit">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Delete" />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Help">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="About" />
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <ToolBar VBox.vgrow="ALWAYS">
+                    <items>
+                        <ImageView fx:id="btnOpenDocument">
+                            <image>
+                                <Image url="@img/open.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnLayerControl">
+                            <image>
+                                <Image url="@img/open.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnFullScreen">
+                            <image>
+                                <Image url="@img/fullscreen.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnZoomIn">
+                            <image>
+                                <Image url="@img/zoomin.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnZoomOut">
+                            <image>
+                                <Image url="@img/zoomout.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnMoveUp">
+                            <image>
+                                <Image url="@img/moveup.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnMoveDown">
+                            <image>
+                                <Image url="@img/movedown.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnMoveLeft">
+                            <image>
+                                <Image url="@img/moveleft.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnMoveRight">
+                            <image>
+                                <Image url="@img/moveright.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnAttributeTable">
+                            <image>
+                                <Image url="@img/attribute.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnClear">
+                            <image>
+                                <Image url="@img/clear.png" />
+                            </image>
+                        </ImageView>
+                    </items>
+                </ToolBar>
+            </children>
+        </VBox>
+    </top>
+    <bottom>
+        <ToolBar BorderPane.alignment="CENTER">
+            <items>
+                <Label fx:id="lblTotals" mnemonicParsing="false" text="" />
+                <Label fx:id="lblSelectCount" mnemonicParsing="false" text="" />
+                <Label fx:id="lblPosition" mnemonicParsing="false" text="" />
+            </items>
+        </ToolBar>
+    </bottom>
+</BorderPane>
