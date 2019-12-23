@@ -109,9 +109,7 @@ public class MainController implements Initializable {
         GISVectorLayer layer = (GISVectorLayer) document.layers.get(0);
         GISNetwork network = new GISNetwork(layer, null, null);
         layer.clearSelection();
-//        List<GISFeature> fs = network.findRoute(new GISVertex(103.642787, 23.812785), new GISVertex(104.356869, 23.665181));
         List<GISFeature> fs = network.findRoute(new GISVertex(-115, 33), new GISVertex(-88, 14));
-//        List<GISFeature> fs = network.findRoute(new GISVertex(98.500903, 15.137487), new GISVertex(102.401171, 15.623522));
         for (GISFeature feature : fs) {
             feature.isSelected = true;
             layer.selection.add(feature);

@@ -124,8 +124,9 @@ public class GISNetwork {
         double[] dist = new double[nodes.size()];
         int[] prov = new int[nodes.size()];
         List<Integer> q = new ArrayList<>();
+
         for (int i = 0; i < nodes.size(); i++) {
-            dist[i] = Double.MAX_VALUE;
+            dist[i] = Double.POSITIVE_INFINITY;
             prov[i] = -1;
             q.add(i);
         }
@@ -135,11 +136,12 @@ public class GISNetwork {
             //寻找Q中dist值最小的节点
             int minIndex = 0;
             for (int i = 1; i < q.size(); i++) {
-                if (dist[q.get(i)] < dist[q.get(minIndex)]) minIndex = i;
+                if (dist[q.get(i)] < dist[q.get(minIndex)])
+                    minIndex = i;
             }
             //如果节点是终点，则退出循环
             if (q.get(minIndex) == toNodeIndex) {
-                findPath = false;
+                findPath = true;
                 break;
             }
             //更新dist及prov
