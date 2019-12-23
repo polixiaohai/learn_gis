@@ -93,11 +93,11 @@ public class GISExtent {
      * @return
      */
     public boolean insertectOrNot(GISExtent extent) {
-        return !(getMaxX() < extent.getMinX() || getMinX() > extent.getMaxX() || getMaxX() < extent.getMinY() || getMinY() > extent.getMaxY());
+        return !(getMaxX() < extent.getMinX() || getMinX() > extent.getMaxX() || getMaxY() < extent.getMinY() || getMinY() > extent.getMaxY());
     }
 
     public boolean insertectOrNot(GISVertex point) {
-        return !(getMaxX() < point.x || getMinX() > point.x || getMaxX() < point.y || getMinY() > point.y);
+        return !(getMaxX() < point.x || getMinX() > point.x || getMaxY() < point.y || getMinY() > point.y);
     }
 
     public GISVertex getCenter() {
