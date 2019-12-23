@@ -30,10 +30,10 @@ public class GISTools {
 
     public static GISExtent calculateExtent(List<GISVertex> vertices) {
         if (vertices.size() == 0) return null;
-        double minx = Double.MAX_VALUE;
-        double miny = Double.MAX_VALUE;
-        double maxx = Double.MIN_VALUE;
-        double maxy = Double.MIN_VALUE;
+        double minx = Double.POSITIVE_INFINITY;
+        double miny = Double.POSITIVE_INFINITY;
+        double maxx = Double.NEGATIVE_INFINITY;
+        double maxy = Double.NEGATIVE_INFINITY;
         for (GISVertex vertex : vertices) {
             minx = Math.min(vertex.x, minx);
             miny = Math.min(vertex.y, miny);

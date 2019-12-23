@@ -41,7 +41,7 @@ public class GISLine extends GISSpatial {
     }
 
     public double distance(GISVertex vertex) {
-        double dis = Double.MAX_VALUE;
+        double dis = Double.POSITIVE_INFINITY;
         for (int i = 0; i < allVertexs.size() - 1; i++) {
             dis = Math.min(GISTools.pointToSegment(allVertexs.get(i), allVertexs.get(i + 1), vertex), dis);
         }

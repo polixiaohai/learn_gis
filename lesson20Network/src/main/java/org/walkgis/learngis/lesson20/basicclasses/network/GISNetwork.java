@@ -23,7 +23,7 @@ public class GISNetwork {
         if (lineLayer.shapeType != SHAPETYPE.polyline) return;
         //如果用户没有提供tolerance，计算
         if (tolerance < 0) {
-            tolerance = Double.MAX_VALUE;
+            tolerance = Double.POSITIVE_INFINITY;
             for (int i = 0; i < lineLayer.featureCount(); i++) {
                 GISPolyline line = (GISPolyline) lineLayer.features.get(i).spatial;
                 tolerance = Math.min(tolerance, line.length);
@@ -94,15 +94,14 @@ public class GISNetwork {
     private void buildMatrix() {
         //初始化邻接矩阵
         matrix = new GISArc[nodes.size()][nodes.size()];
-        for (int i = 0; i < nodes.size(); i++) {
-            for (int j = 0; j < nodes.size(); j++) {
+        for (int i = 0; i < nodes.size(); i++)
+            for (int j = 0; j < nodes.size(); j++)
                 matrix[i][j] = null;
-            }
-        }
 
         //填充邻接矩阵，假定每个弧段都为双向通行，且阻抗相同
         for (int i = 0; i < arcs.size(); i++) {
             matrix[arcs.get(i).fromNodeIndex][arcs.get(i).toNodeIndex] = arcs.get(i);
+            matrix[arcs.get(i).toNodeIndex][arcs.get(i).fromNodeIndex] = arcs.get(i);
         }
     }
 
@@ -176,7 +175,7 @@ public class GISNetwork {
      * @return
      */
     public int findNearestNodeIndex(GISVertex vertex) {
-        double minDist = Double.MAX_VALUE;
+        double minDist = Double.POSITIVE_INFINITY;
         int minIndex = -1;
         for (int i = 0; i < nodes.size(); i++) {
             double dist = nodes.get(i).location.distance(vertex);

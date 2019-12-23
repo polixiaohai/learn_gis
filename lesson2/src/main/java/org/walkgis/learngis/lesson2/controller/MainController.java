@@ -38,7 +38,7 @@ public class MainController implements Initializable {
     @FXML
     private void canvasClick(MouseEvent event) {
         GISVertex gisVertex = new GISVertex(event.getX(), event.getY());
-        double minDis = Double.MAX_VALUE;
+        double minDis = Double.POSITIVE_INFINITY;
         int findId = -1;
         for (int i = 0; i < gisFeatures.size(); i++) {
             double dis = gisFeatures.get(i).spatial.center.distance(gisVertex);

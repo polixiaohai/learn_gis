@@ -26,7 +26,7 @@ public class GISPolyline extends GISSpatial {
     }
 
     public double distance(GISVertex vertex) {
-        double dis = Double.MAX_VALUE;
+        double dis = Double.POSITIVE_INFINITY;
         for (int i = 0; i < vertices.size() - 1; i++) {
             dis = Math.min(GISTools.pointToSegment(vertices.get(i), vertices.get(i + 1), vertex), dis);
         }

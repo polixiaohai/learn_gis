@@ -24,10 +24,10 @@ public class GISTools {
 
     public static GISExtent calculateExtent(List<GISVertex> vertices) {
         if (vertices.size() == 0) return null;
-        final double[] minx = {Double.MAX_VALUE};
-        final double[] miny = {Double.MAX_VALUE};
-        final double[] maxx = {Double.MIN_VALUE};
-        final double[] maxy = {Double.MIN_VALUE};
+        final double[] minx = {Double.POSITIVE_INFINITY};
+        final double[] miny = {Double.POSITIVE_INFINITY};
+        final double[] maxx = {Double.NEGATIVE_INFINITY};
+        final double[] maxy = {Double.NEGATIVE_INFINITY};
         vertices.forEach(vertex -> {
             minx[0] = Math.min(vertex.x, minx[0]);
             miny[0] = Math.min(vertex.y, miny[0]);

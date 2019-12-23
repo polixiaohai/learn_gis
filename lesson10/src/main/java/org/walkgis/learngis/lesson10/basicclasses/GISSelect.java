@@ -39,7 +39,7 @@ public class GISSelect {
     }
 
     private SelectResult selectPolyline(GISVertex vertex, List<GISFeature> features, GISView view, GISExtent minExtent) {
-        Double distance = Double.MAX_VALUE;
+        Double distance = Double.POSITIVE_INFINITY;
         int id = -1;
         //筛选出屏幕视图范围内距离最近的要素
         for (int i = 0; i < features.size(); i++) {
@@ -69,7 +69,7 @@ public class GISSelect {
     }
 
     private SelectResult selectPoint(GISVertex vertex, List<GISFeature> features, GISView view, GISExtent minExtent) {
-        Double distance = Double.MAX_VALUE;
+        Double distance = Double.POSITIVE_INFINITY;
         int id = -1;
         //筛选出屏幕视图范围内距离最近的要素
         for (int i = 0; i < features.size(); i++) {
