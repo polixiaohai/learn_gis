@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="377.0" prefWidth="842.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.walkgis.learngis.lesson20.controller.LayerController">
+   <children>
+      <AnchorPane layoutX="601.0" layoutY="24.0" />
+      <ListView fx:id="layerList" layoutX="30.0" layoutY="21.0" prefHeight="200.0" prefWidth="477.0" />
+      <Button fx:id="btnMoveUp" layoutX="534.0" layoutY="87.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="40.0" text="上移" />
+      <Button fx:id="btnMoveDown" layoutX="534.0" layoutY="121.0" mnemonicParsing="false" text="下移" />
+      <Button fx:id="btnOpenAttr" layoutX="516.0" layoutY="177.0" mnemonicParsing="false" text="打开属性表" />
+      <Button fx:id="btnAddLayer" layoutX="222.0" layoutY="232.0" mnemonicParsing="false" text="添加图层" />
+      <Button fx:id="btnDeleteLayer" layoutX="293.0" layoutY="232.0" mnemonicParsing="false" text="删除图层" />
+      <Button fx:id="btnExportLayer" layoutX="444.0" layoutY="232.0" mnemonicParsing="false" text="导出图层" />
+      <CheckBox fx:id="chbIsSelect" layoutX="30.0" layoutY="275.0" mnemonicParsing="false" text="可选择" />
+      <CheckBox fx:id="chbIsVisible" layoutX="30.0" layoutY="306.0" mnemonicParsing="false" text="可见" />
+      <CheckBox fx:id="chbAutoLabel" layoutX="30.0" layoutY="339.0" mnemonicParsing="false" text="自动标注" />
+      <ChoiceBox fx:id="cmbFields" layoutX="119.0" layoutY="336.0" prefHeight="23.0" prefWidth="249.0" />
+      <Label layoutX="214.0" layoutY="276.0" text="文件地址：" />
+      <TextField fx:id="txtFilePath" editable="false" layoutX="269.0" layoutY="272.0" prefHeight="23.0" prefWidth="238.0" />
+      <Label layoutX="214.0" layoutY="308.0" text="图层名称：" />
+      <Button fx:id="btnApply" layoutX="447.0" layoutY="336.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="57.0" text="应用" />
+      <Button fx:id="btnClose" layoutX="522.0" layoutY="336.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="64.0" text="关闭" />
+      <Button fx:id="btnModify" layoutX="527.0" layoutY="304.0" mnemonicParsing="false" text="修改" />
+      <Button fx:id="btnSaveDocument" layoutX="367.0" layoutY="232.0" mnemonicParsing="false" text="保存文档" />
+      <TextField fx:id="txtWidth" layoutX="665.0" layoutY="58.0" prefHeight="23.0" prefWidth="162.0" />
+      <ColorPicker fx:id="colorOutside" layoutX="664.0" layoutY="91.0" prefHeight="23.0" prefWidth="162.0" />
+      <ColorPicker fx:id="colorInside" layoutX="664.0" layoutY="24.0" prefHeight="23.0" prefWidth="162.0" />
+      <Label layoutX="594.0" layoutY="95.0" text="边界颜色：" />
+      <Label layoutX="594.0" layoutY="62.0" text="绘制尺寸：" />
+      <Label layoutX="592.0" layoutY="28.0" prefHeight="15.0" prefWidth="64.0" text="填充颜色：" />
+      <TextField fx:id="txtLayerName" editable="false" layoutX="269.0" layoutY="304.0" prefHeight="23.0" prefWidth="238.0" />
+      <Label layoutX="594.0" layoutY="170.0" text="专题类型：" />
+      <Label layoutX="594.0" layoutY="200.0" text="专题属性：" />
+      <Label layoutX="594.0" layoutY="233.0" text="分级数量：" />
+      <ComboBox fx:id="cmbTheamticTypes" layoutX="661.0" layoutY="166.0" prefHeight="23.0" prefWidth="162.0" />
+      <ComboBox fx:id="cmbThematicAttr" layoutX="661.0" layoutY="196.0" prefHeight="23.0" prefWidth="162.0" />
+      <TextField fx:id="txtLevels" layoutX="662.0" layoutY="229.0" prefHeight="23.0" prefWidth="162.0" />
+      <Button fx:id="btnThematicApply" layoutX="754.0" layoutY="336.0" mnemonicParsing="false" text="应用专题图" />
+   </children>
+</AnchorPane>
