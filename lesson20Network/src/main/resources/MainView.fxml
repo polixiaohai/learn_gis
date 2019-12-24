@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -102,6 +105,39 @@
                         <ImageView fx:id="btnNetwork">
                             <image>
                                 <Image url="@img/clear.png" />
+                            </image>
+                        </ImageView>
+                        <Separator orientation="VERTICAL" prefHeight="10.0" />
+                        <ComboBox fx:id="cmbRouteFields" />
+                        <ImageView fx:id="btnBuildGrid">
+                            <image>
+                                <Image url="@img/grid.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnReadRouteGrid">
+                            <image>
+                                <Image url="@img/read_grid.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnWriteRouteGrid">
+                            <image>
+                                <Image url="@img/write_grid.png" />
+                            </image>
+                        </ImageView>
+                        <CheckBox fx:id="chbAddPoint" mnemonicParsing="false" text="添加起止点" />
+                        <ImageView fx:id="btnLoadPoint">
+                            <image>
+                                <Image url="@img/load.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnClearPoint" accessibleHelp="的功夫" accessibleText="的功夫">
+                            <image>
+                                <Image url="@img/clear_point.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fx:id="btnShowRoute">
+                            <image>
+                                <Image url="@img/build_route.png" />
                             </image>
                         </ImageView>
                     </items>
