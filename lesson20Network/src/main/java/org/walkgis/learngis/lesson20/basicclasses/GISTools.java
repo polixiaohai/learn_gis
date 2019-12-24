@@ -1,11 +1,8 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
+
 import java.awt.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -173,4 +170,50 @@ public class GISTools {
         int colorLevel = (int) (255 - (float) levelIndex / levelNumber * 255);
         return new Color(colorLevel, colorLevel, colorLevel);
     }
+
+    public static Object fromBytes(RandomAccessFile br, Class c) {
+        Object obj = null;
+        try {
+            byte[] bytes = toBytes(c);
+            br.read(bytes);
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            obj = ois.readObject();
+            ois.close();
+            bis.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return obj;
+    }
+
+    public static byte[] toBytes(Object obj) {
+        byte[] bytes = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(obj);
+            oos.flush();
+            bytes = bos.toByteArray();
+            oos.close();
+            bos.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return bytes;
+    }
+
+    public static String bytesToString(byte[] byteArray) {
+        int count = byteArray.length;
+        for (int i = 0; i < byteArray.length; i++) {
+            if (byteArray[i] == 0) {
+                count = i;
+                break;
+            }
+        }
+       return new String(byteArray, 0, count, StandardCharsets.UTF_8);
+    }
+
 }

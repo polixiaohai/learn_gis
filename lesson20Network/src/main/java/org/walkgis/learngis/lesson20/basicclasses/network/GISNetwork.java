@@ -1,6 +1,11 @@
 package org.walkgis.learngis.lesson20.basicclasses.network;
 
 import org.walkgis.learngis.lesson20.basicclasses.*;
+import org.walkgis.learngis.lesson20.basicclasses.io.GISMyFile;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +52,31 @@ public class GISNetwork {
         buildMatrix();
     }
 
+    /**
+     *  读取
+     * @param fileName
+     */
+    public GISNetwork(String fileName) {
+        List<GISVectorLayer> layers = GISMyFile.readFileMultiLayers(fileName);
+        lineLayer = layers.get(0);
+        readNodeLayer(layers.get(1));
+        readArcLayer(layers.get(2));
+
+        buildMatrix();
+    }
+
+    /**
+     * 写
+     * @param fileName
+     */
+    public void write(String fileName) {
+        List<GISVectorLayer> layers = new ArrayList<>();
+        layers.add(lineLayer);
+        layers.add(createNodeLayer());
+        layers.add(createArcLayer());
+        GISMyFile.writeFileMultiLayers(layers, fileName);
+    }
+
     public GISVectorLayer createNodeLayer() {
         GISVectorLayer nodeLayer = new GISVectorLayer("nodes", SHAPETYPE.point, lineLayer.extent);
         for (int i = 0; i < nodes.size(); i++)
@@ -88,6 +118,33 @@ public class GISNetwork {
             int to = (int) gf.getAttribute(1);
             double impedence = (double) gf.getAttribute(2);
             arcs.add(new GISArc(lineLayer.features.get(i), from, to, impedence));
+        }
+    }
+
+    public void writeFile(GISVectorLayer layer, String fileName) {
+        List<GISVectorLayer> layers = new ArrayList<>();
+        layers.add(layer);
+        writeFileMultiLayers(layers, fileName);
+    }
+
+    private void writeFileMultiLayers(List<GISVectorLayer> layers, String fileName) {
+        RandomAccessFile randomAccessFile = null;
+        try {
+            randomAccessFile = new RandomAccessFile(fileName, "rw");
+            for (GISVectorLayer layer : layers) {
+                writeFile(layer, fileName);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (randomAccessFile != null)
+                    randomAccessFile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

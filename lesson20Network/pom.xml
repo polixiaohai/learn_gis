@@ -24,11 +24,6 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.albfernandez</groupId>
-            <artifactId>javadbf</artifactId>
-            <version>1.9.4</version>
-        </dependency>
-        <dependency>
             <groupId>de.roskenet</groupId>
             <artifactId>springboot-javafx-support</artifactId>
             <version>2.1.6</version>
