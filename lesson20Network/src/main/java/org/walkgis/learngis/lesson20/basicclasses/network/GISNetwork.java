@@ -67,8 +67,35 @@ public class GISNetwork {
     }
 
     public GISNetwork(GISVectorLayer lineLayer) {
+        int fieldIndex = -1;
+        double tolerance = -1.0;
+
         this.lineLayer = lineLayer;
-// TODO: 2019/12/25
+        //如果该图层不是线图层，则返回
+        if (lineLayer.shapeType != SHAPETYPE.polyline) return;
+        //如果用户没有提供tolerance，计算
+        if (tolerance < 0) {
+            tolerance = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < lineLayer.featureCount(); i++) {
+                GISPolyline line = (GISPolyline) lineLayer.features.get(i).spatial;
+                tolerance = Math.min(tolerance, line.length);
+            }
+            //找出最小的线实体长度，令其缩小100倍，作为tolerance
+            tolerance /= 100;
+        }
+
+        //填充结点列表和弧段列表
+        for (int i = 0; i < lineLayer.featureCount(); i++) {
+            GISPolyline line = (GISPolyline) lineLayer.features.get(i).spatial;
+            //获取对应节点
+            int from = findOrInsertNode(line.fromNode(), tolerance);
+            int to = findOrInsertNode(line.toNode(), tolerance);
+            //获得阻抗，可以是自己设置的一个属性或者是弧段长度
+            double impedence = (fieldIndex > 0) ? (double) (lineLayer.features.get(i).getAttribute(fieldIndex)) : line.length;
+            //增加到弧段列表
+            arcs.add(new GISArc(lineLayer.features.get(i), from, to, impedence));
+        }
+        //建立邻接矩阵
         buildMatrix();
     }
 
