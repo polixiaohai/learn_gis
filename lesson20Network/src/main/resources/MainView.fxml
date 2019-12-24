@@ -130,7 +130,7 @@
                                 <Image url="@img/load.png" />
                             </image>
                         </ImageView>
-                        <ImageView fx:id="btnClearPoint" accessibleHelp="的功夫" accessibleText="的功夫">
+                        <ImageView fx:id="btnClearPoint">
                             <image>
                                 <Image url="@img/clear_point.png" />
                             </image>
