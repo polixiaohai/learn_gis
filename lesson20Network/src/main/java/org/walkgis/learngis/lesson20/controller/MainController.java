@@ -10,10 +10,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ContextMenuEvent;
@@ -39,8 +38,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 
 @FXMLController
@@ -53,6 +54,12 @@ public class MainController implements Initializable {
     private Canvas mainCanvas;
     @FXML
     private ImageView btnOpenDocument, btnLayerControl, btnFullScreen, btnZoomIn, btnZoomOut, btnMoveUp, btnMoveDown, btnMoveLeft, btnMoveRight, btnClear, btnNetwork;
+    @FXML
+    private ImageView btnBuildGrid, btnReadRouteGrid, btnWriteRouteGrid, btnLoadPoint, btnClearPoint, btnShowRoute;
+    @FXML
+    private CheckBox chbAddPoint;
+    @FXML
+    private ComboBox cmbRouteFields;
     @FXML
     private Label lblPosition, lblTotals, lblSelectCount;
     @FXML
@@ -75,6 +82,10 @@ public class MainController implements Initializable {
     private GISView view;
     private Rectangle clientRectangle;
     public GISDocument document = new GISDocument();
+    private GISNetwork network;
+    private GISVectorLayer stopsLayer;
+    private GISVectorLayer lineLayer;
+    private List<GISVertex> netPoints = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -102,12 +113,164 @@ public class MainController implements Initializable {
 
         mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
         mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
+
+        List<GISField> fields = new ArrayList<>();
+        fields.add(new GISField(Integer.class, "index"));
+        stopsLayer = new GISVectorLayer("stops" + UUID.randomUUID().toString(), SHAPETYPE.point, null, fields);
+        stopsLayer.labelIndex = 0;
+        stopsLayer.drawAttributeOrNot = true;
+
+        chbAddPoint.setTooltip(new Tooltip("添加起止点"));
+
+        Tooltip.install(btnBuildGrid, new Tooltip("构建网络结构"));
+        Tooltip.install(btnReadRouteGrid, new Tooltip("读取网络结构"));
+        Tooltip.install(btnWriteRouteGrid, new Tooltip("导出网络结构"));
+        Tooltip.install(btnLoadPoint, new Tooltip("加载起止点"));
+        Tooltip.install(btnClearPoint, new Tooltip("清空起止点"));
+        Tooltip.install(btnShowRoute, new Tooltip("显示最短路径"));
+
+        chbAddPoint.setSelected(false);
+
+        cmbRouteFields.setOnMouseClicked(this::cmbRouteFieldsClick);
+        btnBuildGrid.setOnMouseClicked(this::btnBuildGridClick);
+        btnReadRouteGrid.setOnMouseClicked(this::btnReadRouteGridClicck);
+        btnWriteRouteGrid.setOnMouseClicked(this::btnWriteRouteGridClicck);
+        btnLoadPoint.setOnMouseClicked(this::btnLoadPointClicck);
+        btnClearPoint.setOnMouseClicked(this::btnClearPointClicck);
+        btnShowRoute.setOnMouseClicked(this::btnShowRouteClicck);
+    }
+
+    @FXML
+    private void btnShowRouteClicck(MouseEvent mouseEvent) {
+        if (stopsLayer.features.size() < 2) return;
+        checkLayers();
+        lineLayer.clearSelection();
+        for (int i = 1; i < stopsLayer.features.size(); i++) {
+            GISVertex vFrom = stopsLayer.features.get(i - 1).spatial.center;
+            GISVertex vTo = stopsLayer.features.get(i).spatial.center;
+
+            List<GISFeature> fs = network.findRoute(vFrom, vTo);
+            lineLayer.select(fs);
+        }
+        updateMap();
+    }
+
+    @FXML
+    private void btnClearPointClicck(MouseEvent mouseEvent) {
+        initGrid();
+    }
+
+    @FXML
+    private void btnLoadPointClicck(MouseEvent mouseEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择数据");
+        Stage selectFile = new Stage();
+        if (StringUtils.isEmpty(dataDir) || !new File(dataDir).exists())
+            dataDir = System.getProperty("user.home");
+        fileChooser.setInitialDirectory(new File(dataDir));
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("所有文件类型", "*." + GISConst.SHP),
+                new FileChooser.ExtensionFilter("Shapefile", "*." + GISConst.SHP)
+        );
+        File file = fileChooser.showOpenDialog(selectFile);
+        if (file != null) {
+            GISLayer layer = GISTools.getLayer(file.getAbsolutePath());
+            if (layer.layerType != LAYERTYPE.VectorLayer) return;
+            if (((GISVectorLayer) layer).shapeType != SHAPETYPE.point) return;
+            initGrid();
+            GISVectorLayer pointLayer = (GISVectorLayer) layer;
+            for (int i = 0; i < pointLayer.features.size(); i++) {
+                GISVertex vertex = pointLayer.features.get(i).spatial.center;
+                //展示出来
+                netPoints.add(vertex);
+                GISAttribute attribute = new GISAttribute();
+                attribute.addValue(netPoints.size());
+                stopsLayer.addFeature(new GISFeature(new GISPoint(vertex), attribute), true);
+            }
+            updateMap();
+        }
+    }
+
+    @FXML
+    private void btnWriteRouteGridClicck(MouseEvent mouseEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("保存文档");
+        Stage selectFile = new Stage();
+        if (StringUtils.isEmpty(dataDir))
+            dataDir = System.getProperty("user.home");
+        fileChooser.setInitialDirectory(new File(dataDir));
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("所有文件类型", "*." + GISConst.NETFILE),
+                new FileChooser.ExtensionFilter("网络类型", "*." + GISConst.NETFILE)
+        );
+        File file = fileChooser.showSaveDialog(selectFile);
+        if (file != null) {
+            network.write(file.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void btnReadRouteGridClicck(MouseEvent mouseEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择数据");
+        Stage selectFile = new Stage();
+        if (StringUtils.isEmpty(dataDir) || !new File(dataDir).exists())
+            dataDir = System.getProperty("user.home");
+        fileChooser.setInitialDirectory(new File(dataDir));
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("所有文件类型", "*." + GISConst.NETFILE),
+                new FileChooser.ExtensionFilter("网络类型", "*." + GISConst.NETFILE)
+        );
+        File file = fileChooser.showOpenDialog(selectFile);
+        if (file != null) {
+            network = new GISNetwork(file.getAbsolutePath());
+            lineLayer = network.lineLayer;
+            initGrid();
+        }
+    }
+
+    @FXML
+    private void btnBuildGridClick(MouseEvent mouseEvent) {
+        lineLayer = (GISVectorLayer) document.getLayer(cmbRouteFields.getSelectionModel().getSelectedItem().toString());
+        if (lineLayer == null) return;
+        network = new GISNetwork(lineLayer);
+        initGrid();
+    }
+
+    private void initGrid() {
+        checkLayers();
+        stopsLayer.deleteAllFeatures();
+        lineLayer.clearSelection();
+        chbAddPoint.setSelected(true);
+        netPoints.clear();
+        updateMap();
+    }
+
+    private void checkLayers() {
+        if (document.getLayer(lineLayer.name) == null)
+            document.addLayer(lineLayer);
+        if (document.getLayer(stopsLayer.name) == null)
+            document.addLayer(stopsLayer);
+    }
+
+    @FXML
+    private void cmbRouteFieldsClick(MouseEvent mouseEvent) {
+        cmbRouteFields.getItems().clear();
+        for (int i = 0; i < document.layers.size(); i++) {
+            GISLayer layer = document.layers.get(i);
+            if (layer.layerType != LAYERTYPE.VectorLayer) continue;
+            if (((GISVectorLayer) layer).shapeType != SHAPETYPE.polyline) continue;
+            cmbRouteFields.getItems().add(layer.name);
+        }
     }
 
     @FXML
     private void btnNetworkClick(MouseEvent mouseEvent) {
         GISVectorLayer layer = (GISVectorLayer) document.layers.get(0);
-        GISNetwork network = new GISNetwork(layer, null, null);
+        network = new GISNetwork(layer, null, null);
         layer.clearSelection();
         List<GISFeature> fs = network.findRoute(new GISVertex(-115, 33), new GISVertex(-88, 14));
         for (GISFeature feature : fs) {
@@ -365,6 +528,18 @@ public class MainController implements Initializable {
     private void canvasClick(MouseEvent event) {
         if (contextMenu != null) {
             contextMenu.hide();
+        }
+
+        if (event.getClickCount() == 2 && event.getButton().name().equals("PRIMARY")) {
+            if (chbAddPoint.isSelected()) {
+                checkLayers();
+                GISVertex vertex = view.toMapVertex(new Point((int) event.getX(), (int) event.getY()));
+                netPoints.add(vertex);
+                GISAttribute attribute = new GISAttribute();
+                attribute.addValue(netPoints.size());
+                stopsLayer.addFeature(new GISFeature(new GISPoint(vertex), attribute), true);
+                updateMap();
+            }
         }
     }
 

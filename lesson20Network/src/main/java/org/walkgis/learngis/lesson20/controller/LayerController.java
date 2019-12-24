@@ -1,15 +1,11 @@
 package org.walkgis.learngis.lesson20.controller;
 
 import de.felixroske.jfxsupport.FXMLController;
-import de.felixroske.jfxsupport.GUIState;
 import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -264,7 +260,7 @@ public class LayerController implements Initializable {
         );
         File file = fileChooser.showOpenDialog(selectFile);
         if (file != null) {
-            GISLayer layer = mainController.document.addLayer(file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")));
+            GISLayer layer = mainController.document.addLayer(file.getAbsolutePath());
             layerList.getItems().add(0, layer.name);
             layerList.getSelectionModel().select(0);
         }

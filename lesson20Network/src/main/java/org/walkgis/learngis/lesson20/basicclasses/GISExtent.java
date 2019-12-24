@@ -114,6 +114,7 @@ public class GISExtent {
     }
 
     public void merge(GISExtent extent) {
+        if (extent == null) return;
         upRight.x = Math.max(upRight.x, extent.upRight.x);
         upRight.y = Math.max(upRight.y, extent.upRight.y);
         bottomLeft.x = Math.min(bottomLeft.x, extent.bottomLeft.x);

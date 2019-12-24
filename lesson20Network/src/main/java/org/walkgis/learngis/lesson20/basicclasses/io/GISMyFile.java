@@ -69,7 +69,7 @@ public class GISMyFile {
             for (int i = 0; i < mfh.featureCount; i++) {
                 GISSpatial spatial = readSpatial(ShapeType, br);
                 GISAttribute attribute = readAttribute(br, fields);
-                layer.addFeature(new GISFeature(spatial, attribute));
+                layer.addFeature(new GISFeature(spatial, attribute),false);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -247,7 +247,7 @@ public class GISMyFile {
         for (int i = 0; i < featureCount; i++) {
             GISSpatial spatial = readSpatial(layer.shapeType, randomAccessFile);
             GISAttribute attribute = readAttribute(randomAccessFile, layer.fields);
-            layer.addFeature(new GISFeature(spatial, attribute));
+            layer.addFeature(new GISFeature(spatial, attribute),false);
         }
     }
 }

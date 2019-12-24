@@ -53,7 +53,8 @@ public class GISNetwork {
     }
 
     /**
-     *  读取
+     * 读取
+     *
      * @param fileName
      */
     public GISNetwork(String fileName) {
@@ -65,8 +66,15 @@ public class GISNetwork {
         buildMatrix();
     }
 
+    public GISNetwork(GISVectorLayer lineLayer) {
+        this.lineLayer = lineLayer;
+// TODO: 2019/12/25
+        buildMatrix();
+    }
+
     /**
      * 写
+     *
      * @param fileName
      */
     public void write(String fileName) {
@@ -80,7 +88,7 @@ public class GISNetwork {
     public GISVectorLayer createNodeLayer() {
         GISVectorLayer nodeLayer = new GISVectorLayer("nodes", SHAPETYPE.point, lineLayer.extent);
         for (int i = 0; i < nodes.size(); i++)
-            nodeLayer.addFeature(new GISFeature(new GISPoint(nodes.get(i).location), new GISAttribute()));
+            nodeLayer.addFeature(new GISFeature(new GISPoint(nodes.get(i).location), new GISAttribute()), false);
         return nodeLayer;
     }
 
@@ -98,7 +106,7 @@ public class GISNetwork {
             a.addValue(arcs.get(i).toNodeIndex);
             a.addValue(arcs.get(i).impedence);
             //添加控件对象
-            arcLayer.addFeature(new GISFeature(arcs.get(i).feature.spatial, a));
+            arcLayer.addFeature(new GISFeature(arcs.get(i).feature.spatial, a), false);
         }
         return arcLayer;
     }

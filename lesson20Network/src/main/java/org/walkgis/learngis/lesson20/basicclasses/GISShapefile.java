@@ -1,10 +1,12 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
+import com.linuxense.javadbf.DBFDataType;
+import com.linuxense.javadbf.DBFField;
+import com.linuxense.javadbf.DBFReader;
 import org.walkgis.learngis.lesson20.Utils;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.time.chrono.MinguoDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +40,7 @@ public class GISShapefile {
         public int ShapeType;
     }
 
-    class DBFHeader {
+    public static class DBFHeader {
         public char FileType, Year, Month, Day;
         public int RecordCount;
         public short HeaderLength, RecordLength;
@@ -47,7 +49,7 @@ public class GISShapefile {
         public short Unused5;
     }
 
-    public ShapefileHeader readFileHeader(RandomAccessFile dataInputStream) {
+    public ShapefileHeader readFileHeader(DataInputStream dataInputStream) {
         ShapefileHeader header = new ShapefileHeader();
         byte[] doubleByte = new byte[8];
         byte[] intByte = new byte[4];
@@ -94,7 +96,7 @@ public class GISShapefile {
         return header;
     }
 
-    public RecordHeader readRecordHeader(RandomAccessFile dataInputStream) {
+    public RecordHeader readRecordHeader(DataInputStream dataInputStream) {
         RecordHeader recordHeader = new RecordHeader();
         byte[] intByte = new byte[4];
         try {
@@ -121,27 +123,94 @@ public class GISShapefile {
         return Utils.bytes2Int(bigbytes, 0);
     }
 
+//    public GISVectorLayer readShapefile(String shpfilename) {
+//        //打开文件和读取工具
+//        RandomAccessFile br = null;
+//        GISVectorLayer layer = null;
+//        try {
+//            br = new RandomAccessFile(shpfilename + ".shp", "r");
+//            //读取文件头
+//            ShapefileHeader sfh = readFileHeader(br);
+//            //获得空间对象类型
+//            SHAPETYPE ShapeType = SHAPETYPE.getByValue(sfh.ShapeType);
+//            //获得空间范围
+//            GISExtent extent = new GISExtent(new GISVertex(sfh.Xmin, sfh.Ymin), new GISVertex(sfh.Xmax, sfh.Ymax));
+//
+//            List<GISField> fields = new ArrayList<>();
+//            List<GISAttribute> attributes = new ArrayList<>();
+//
+//            readDBFFile(shpfilename + ".dbf", fields, attributes);
+//            //初始化图层
+//            layer = new GISVectorLayer(shpfilename, ShapeType, extent, fields);
+//            int index = 0;
+//            while (br.read() != -1) {
+//                //读记录头
+//                RecordHeader rh = readRecordHeader(br);
+//                int recordLength = fromBigToLittle(rh.RecordLength) * 2 - 4;
+//                byte[] recordContent = new byte[recordLength];
+//                br.read(recordContent);
+//                //开始读实际的空间数据
+//                if (ShapeType == SHAPETYPE.point) {
+//                    GISPoint onepoint = readPoint(recordContent);
+//                    GISFeature onefeature = new GISFeature(onepoint, attributes.get(index));
+//                    layer.addFeature(onefeature);
+//                    index++;
+//                } else if (ShapeType == SHAPETYPE.polyline) {
+//                    List<GISPolyline> lines = readLines(recordContent);
+//                    GISVectorLayer finalLayer = layer;
+//                    int finalIndex1 = index;
+//                    lines.forEach(line -> {
+//                        GISFeature onefeature = new GISFeature(line, attributes.get(finalIndex1));
+//                        finalLayer.addFeature(onefeature);
+//                    });
+//                    index++;
+//                } else if (ShapeType == SHAPETYPE.polygon) {
+//                    List<GISPolygon> polygons = readPolygons(recordContent);
+//                    GISVectorLayer finalLayer1 = layer;
+//                    int finalIndex = index;
+//                    polygons.forEach(polygon -> {
+//                        GISFeature onefeature = new GISFeature(polygon, attributes.get(finalIndex));
+//                        finalLayer1.addFeature(onefeature);
+//                    });
+//                    index++;
+//                }
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (br != null) br.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return layer;
+//    }
+
     public GISVectorLayer readShapefile(String shpfilename) {
         //打开文件和读取工具
-        RandomAccessFile br = null;
+        FileInputStream fsr = null;
         GISVectorLayer layer = null;
         try {
-            br = new RandomAccessFile(shpfilename + ".shp", "r");
+            shpfilename = shpfilename.substring(0, shpfilename.lastIndexOf("."));
+            fsr = new FileInputStream(shpfilename + ".shp");
+            DBFReader dbfReader = new DBFReader(new FileInputStream(shpfilename + ".dbf"), Charset.forName("UTF-8"));
+
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fsr);
+            DataInputStream br = new DataInputStream(bufferedInputStream);
             //读取文件头
             ShapefileHeader sfh = readFileHeader(br);
             //获得空间对象类型
             SHAPETYPE ShapeType = SHAPETYPE.getByValue(sfh.ShapeType);
             //获得空间范围
             GISExtent extent = new GISExtent(new GISVertex(sfh.Xmin, sfh.Ymin), new GISVertex(sfh.Xmax, sfh.Ymax));
-
-            List<GISField> fields = new ArrayList<>();
-            List<GISAttribute> attributes = new ArrayList<>();
-
-            readDBFFile(shpfilename + ".dbf", fields, attributes);
             //初始化图层
-            layer = new GISVectorLayer(shpfilename, ShapeType, extent, fields);
-            int index = 0;
-            while (br.read() != -1) {
+            layer = new GISVectorLayer(shpfilename, ShapeType, extent, getFields(dbfReader));
+            Object[] rowValues;
+            while (br.available() > 0 && ((rowValues = dbfReader.nextRecord()) != null)) {
                 //读记录头
                 RecordHeader rh = readRecordHeader(br);
                 int recordLength = fromBigToLittle(rh.RecordLength) * 2 - 4;
@@ -150,42 +219,81 @@ public class GISShapefile {
                 //开始读实际的空间数据
                 if (ShapeType == SHAPETYPE.point) {
                     GISPoint onepoint = readPoint(recordContent);
-                    GISFeature onefeature = new GISFeature(onepoint, attributes.get(index));
-                    layer.addFeature(onefeature);
-                    index++;
+                    GISFeature onefeature = new GISFeature(onepoint, new GISAttribute(rowValues));
+                    layer.addFeature(onefeature,false);
                 } else if (ShapeType == SHAPETYPE.polyline) {
                     List<GISPolyline> lines = readLines(recordContent);
                     GISVectorLayer finalLayer = layer;
-                    int finalIndex1 = index;
+                    Object[] finalRowValues = rowValues;
                     lines.forEach(line -> {
-                        GISFeature onefeature = new GISFeature(line, attributes.get(finalIndex1));
-                        finalLayer.addFeature(onefeature);
+                        GISFeature onefeature = new GISFeature(line, new GISAttribute(finalRowValues));
+                        finalLayer.addFeature(onefeature,false);
                     });
-                    index++;
                 } else if (ShapeType == SHAPETYPE.polygon) {
                     List<GISPolygon> polygons = readPolygons(recordContent);
                     GISVectorLayer finalLayer1 = layer;
-                    int finalIndex = index;
+                    Object[] finalRowValues1 = rowValues;
                     polygons.forEach(polygon -> {
-                        GISFeature onefeature = new GISFeature(polygon, attributes.get(finalIndex));
-                        finalLayer1.addFeature(onefeature);
+                        GISFeature onefeature = new GISFeature(polygon, new GISAttribute(finalRowValues1));
+                        finalLayer1.addFeature(onefeature,false);
                     });
-                    index++;
                 }
             }
+            //关闭读取工具和文件
+            br.close();
+            dbfReader.close();
+            bufferedInputStream.close();
+            fsr.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         return layer;
+    }
+
+    private static List<GISField> getFields(DBFReader dbfReader) {
+        List<GISField> fields = new ArrayList<>();
+
+        for (int i = 0, size = dbfReader.getFieldCount(); i < size; i++) {
+            DBFField field = dbfReader.getField(i);
+            fields.add(new GISField(getType(field.getType()), field.getName()));
+        }
+
+        return fields;
+    }
+
+    private static Class getType(DBFDataType type) {
+        Class clzz = String.class;
+        switch (type) {
+            case UNKNOWN:
+            case CHARACTER:
+                clzz = Character.class;
+                break;
+            case VARCHAR:
+                clzz = String.class;
+                break;
+            case DOUBLE:
+                clzz = Double.class;
+                break;
+            case LONG:
+                clzz = Long.class;
+                break;
+            case AUTOINCREMENT:
+                clzz = Integer.class;
+                break;
+            case TIMESTAMP:
+            case DATE:
+                clzz = Date.class;
+                break;
+            case NULL_FLAGS:
+                clzz = Boolean.class;
+                break;
+            default:
+                break;
+        }
+        return clzz;
     }
 
     private void readDBFFile(String dbffilename, List<GISField> fields, List<GISAttribute> attributes) {

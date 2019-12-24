@@ -7,7 +7,7 @@ public class GISField {
     public Class dataType;
     public String fieldName;
 
-    public class DBFField {
+    public static class DBFField {
         public byte b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11;
         public char fieldType;
         public int displacementInRecord;

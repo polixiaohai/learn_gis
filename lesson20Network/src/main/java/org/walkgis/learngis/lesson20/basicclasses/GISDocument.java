@@ -18,13 +18,15 @@ public class GISDocument {
         return null;
     }
 
+    public GISLayer addLayer(GISLayer layer) {
+        getUniqueName(layer);
+        layers.add(layer);
+        updateExtent();
+        return layer;
+    }
+
     public GISLayer addLayer(String absolutePath) {
-        GISLayer layer = null;
-        String fileType = "";
-        if (fileType.equalsIgnoreCase("")) {
-            layer = new GISShapefile().readShapefile(absolutePath);
-        } else layer = new GISRasterLayer(absolutePath);
-        layer.path = absolutePath;
+        GISLayer layer = GISTools.getLayer(absolutePath);
         getUniqueName(layer);
         layers.add(layer);
         updateExtent();
@@ -162,6 +164,7 @@ public class GISDocument {
         try {
             randomAccessFile = new RandomAccessFile(new File(documentFilePath), "rw");
             for (int i = 0; i < layers.size(); i++) {
+                if (layers.get(i).path == null) return;
                 GISLayer layer = layers.get(i);
                 GISTools.writeString(layer.path, randomAccessFile);
                 randomAccessFile.writeBoolean(layer.visible);

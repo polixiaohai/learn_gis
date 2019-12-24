@@ -4,6 +4,8 @@ package org.walkgis.learngis.lesson20.basicclasses;
 import java.awt.*;
 
 public class GISConst {
+
+
     public static double minScreenDistance = 5;
 
     //点的颜色和半径
@@ -26,4 +28,9 @@ public class GISConst {
     public static double zoomInFactor = 0.8;
     //地图缩小系数
     public static double zoomOutFactor = 0.8;
+
+    public static final String NETFILE = "net";
+    public static final String SHP = "shp";
+    public static final String MYFILE = "myf";
+    public static final String RASTER = "rst";
 }

@@ -94,15 +94,27 @@ public class GISVectorLayer extends GISLayer {
         return selectResult;
     }
 
+    public void select(List<GISFeature> features) {
+        features.forEach(f -> {
+            f.isSelected = true;
+            selection.add(f);
+        });
+    }
+
     public void clearSelection() {
         selection.stream().forEach(sel -> sel.isSelected = false);
         selection.clear();
     }
 
-    public void addFeature(GISFeature feature) {
+    public void addFeature(GISFeature feature, boolean updateExtent) {
         if (features.size() == 0) feature.id = 0;
         else feature.id = features.get(features.size() - 1).id + 1;
         features.add(feature);
+        if (!updateExtent) return;
+        if (features.size() == 1)
+            extent = new GISExtent(feature.spatial.extent);
+        else
+            extent.merge(feature.spatial.extent);
     }
 
     public int featureCount() {
@@ -188,5 +200,10 @@ public class GISVectorLayer extends GISLayer {
             thematics.put(i, new GISThematic(outSideColor, size, GISTools.getGradualColor(i, levelNumber)));
         }
         return true;
+    }
+
+    public void deleteAllFeatures() {
+        features.clear();
+        extent = null;
     }
 }

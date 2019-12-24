@@ -1,8 +1,16 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
 
+import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
+import org.walkgis.learngis.lesson20.Utils;
+import org.walkgis.learngis.lesson20.basicclasses.io.GISMyFile;
+import sun.misc.Unsafe;
+
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -171,36 +179,115 @@ public class GISTools {
         return new Color(colorLevel, colorLevel, colorLevel);
     }
 
-    public static Object fromBytes(RandomAccessFile br, Class c) {
-        Object obj = null;
+    public static Object fromBytes(RandomAccessFile br, Class clazz) {
         try {
-            byte[] bytes = toBytes(c);
-            br.read(bytes);
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            obj = ois.readObject();
-            ois.close();
-            bis.close();
+            byte[] intByte = new byte[4];
+            byte[] doubleByte = new byte[8];
+            byte[] longByte = new byte[8];
+            byte[] shortByte = new byte[4];
+            if (clazz == GISField.DBFField.class) {
+                //region DBFField
+                GISField.DBFField field = new GISField.DBFField();
+                field.b1 = br.readByte();
+                field.b2 = br.readByte();
+                field.b3 = br.readByte();
+                field.b4 = br.readByte();
+                field.b5 = br.readByte();
+                field.b6 = br.readByte();
+                field.b7 = br.readByte();
+                field.b8 = br.readByte();
+                field.b9 = br.readByte();
+                field.b10 = br.readByte();
+                field.b11 = br.readByte();
+                field.fieldType = br.readChar();
+                br.read(intByte);
+                field.displacementInRecord = Utils.bytes2Int(intByte, 0);
+                field.Unused19 = br.readByte();
+                field.Unused20 = br.readByte();
+                field.Unused21 = br.readByte();
+                field.Unused22 = br.readByte();
+                field.Unused23 = br.readByte();
+                field.Unused24 = br.readByte();
+                field.Unused25 = br.readByte();
+                field.Unused26 = br.readByte();
+                field.Unused27 = br.readByte();
+                field.Unused28 = br.readByte();
+                field.Unused29 = br.readByte();
+                field.Unused30 = br.readByte();
+                field.Unused31 = br.readByte();
+                field.Unused32 = br.readByte();
+                //endregion
+                return field;
+            } else if (clazz == GISMyFile.MyFileHeader.class) {
+                //region MyFileHeader
+                GISMyFile.MyFileHeader header = new GISMyFile.MyFileHeader();
+                br.read(doubleByte);
+                header.minx = Utils.bytes2Double(doubleByte, 0);
+                br.read(doubleByte);
+                header.miny = Utils.bytes2Double(doubleByte, 0);
+                br.read(doubleByte);
+                header.maxx = Utils.bytes2Double(doubleByte, 0);
+                br.read(doubleByte);
+                header.maxy = Utils.bytes2Double(doubleByte, 0);
+                br.read(intByte);
+                header.shapeType = Utils.bytes2Int(doubleByte, 0);
+                br.read(intByte);
+                header.fieldCount = Utils.bytes2Int(doubleByte, 0);
+                br.read(intByte);
+                header.featureCount = Utils.bytes2Int(doubleByte, 0);
+                //endregion
+                return header;
+            } else if (clazz == GISShapefile.DBFHeader.class) {
+                //region DBFHeader
+                GISShapefile.DBFHeader header = new GISShapefile.DBFHeader();
+                header.FileType = br.readChar();
+                header.Year = br.readChar();
+                header.Month = br.readChar();
+                header.Day = br.readChar();
+                br.read(intByte);
+                header.RecordCount = Utils.bytes2Int(intByte, 0);
+                br.read(shortByte);
+                header.HeaderLength = Utils.bytes2Short(shortByte, 0);
+                br.read(shortByte);
+                header.RecordLength = Utils.bytes2Short(shortByte, 0);
+                br.read(longByte);
+                header.Unused1 = Utils.bytesToLong(longByte);
+                br.read(longByte);
+                header.Unused2 = Utils.bytesToLong(longByte);
+                header.Unused3 = br.readChar();
+                header.Unused4 = br.readChar();
+                br.read(shortByte);
+                header.Unused5 = Utils.bytes2Short(shortByte, 0);
+                //endregion
+                return header;
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return obj;
+        return null;
     }
 
     public static byte[] toBytes(Object obj) {
         byte[] bytes = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bos = null;
+        ObjectOutputStream oos = null;
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            bos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(bos);
             oos.writeObject(obj);
             oos.flush();
             bytes = bos.toByteArray();
-            oos.close();
-            bos.close();
         } catch (IOException ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                if (oos != null) oos.close();
+                if (oos != null) bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return bytes;
     }
@@ -213,7 +300,19 @@ public class GISTools {
                 break;
             }
         }
-       return new String(byteArray, 0, count, StandardCharsets.UTF_8);
+        return new String(byteArray, 0, count, StandardCharsets.UTF_8);
     }
 
+    public static GISLayer getLayer(String path) {
+        GISLayer layer = null;
+        String fileType = path.substring(path.lastIndexOf("."));
+        if (fileType.equalsIgnoreCase("." + GISConst.SHP))
+            layer = new GISShapefile().readShapefile(path);
+        else if (fileType.equalsIgnoreCase("." + GISConst.MYFILE))
+            layer = GISMyFile.readFile(path);
+        else if (fileType.equalsIgnoreCase("." + GISConst.RASTER))
+            layer = new GISRasterLayer(path);
+        layer.path = path;
+        return layer;
+    }
 }
