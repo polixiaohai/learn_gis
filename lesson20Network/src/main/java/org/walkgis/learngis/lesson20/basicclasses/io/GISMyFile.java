@@ -1,9 +1,9 @@
 package org.walkgis.learngis.lesson20.basicclasses.io;
 
 import org.walkgis.learngis.lesson20.basicclasses.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+
+import java.io.*;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,24 +16,49 @@ public class GISMyFile {
         public int shapeType;
         public int fieldCount;
         public int featureCount;
+
+        //写入数据
+        public void write(DataOutputStream out) throws IOException {
+            out.writeDouble(this.minx);
+            out.writeDouble(this.miny);
+            out.writeDouble(this.maxx);
+            out.writeDouble(this.maxy);
+            out.writeInt(this.shapeType);
+            out.writeInt(this.fieldCount);
+            out.writeInt(this.featureCount);
+        }
+
+        //读取数据
+        public void read(DataInputStream input) throws IOException {
+            this.minx = input.readDouble();
+            this.miny = input.readDouble();
+            this.maxx = input.readDouble();
+            this.maxy = input.readDouble();
+            this.shapeType = input.readInt();
+            this.fieldCount = input.readInt();
+            this.featureCount = input.readInt();
+        }
     }
 
     public void writeSingleFile(GISVectorLayer layer, String filename) {
-        RandomAccessFile bw = null;
+        BufferedOutputStream bufferOut = null;
+        DataOutputStream dataOut = null;
         try {
-            bw = new RandomAccessFile(filename, "rw");
+            Path path = Paths.get(filename);
+            bufferOut = new BufferedOutputStream(Files.newOutputStream(path, StandardOpenOption.WRITE));
+            dataOut = new DataOutputStream(bufferOut);
             //写文件头
-            writeFileHeader(layer, bw);
+            writeFileHeader(layer, dataOut);
             //写图层名称
-            GISTools.writeString(layer.name, bw);
+            GISTools.writeString(layer.name, dataOut);
             //写属性字段结构
             for (GISField field : layer.fields) {
-                GISTools.writeString(field.dataType.toString(), bw);
-                GISTools.writeString(field.fieldName, bw);
+                GISTools.writeString(field.dataType.toString(), dataOut);
+                GISTools.writeString(field.fieldName, dataOut);
             }
             //写空间对象类型
             for (GISFeature f : layer.features)
-                writeFeature(f, bw);
+                writeFeature(f, dataOut);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -42,7 +67,8 @@ public class GISMyFile {
         } finally {
             //其它内容
             try {
-                bw.close();
+                dataOut.close();
+                bufferOut.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -51,25 +77,28 @@ public class GISMyFile {
     }
 
     public GISLayer readSingleFile(String filename) {
-        RandomAccessFile br = null;
+        BufferedInputStream bufferInput = null;
+        DataInputStream dataInput = null;
         GISVectorLayer layer = null;
         try {
-            br = new RandomAccessFile(filename, "rw");
+            bufferInput = new BufferedInputStream(new FileInputStream(filename));
+            dataInput = new DataInputStream(bufferInput);
             //读文件头
-            MyFileHeader mfh = (MyFileHeader) GISTools.fromBytes(br, MyFileHeader.class);
+            MyFileHeader mfh = new MyFileHeader();
+            mfh.read(dataInput);
             //读图层名称
-            String name = GISTools.readString(br);
+            String name = GISTools.readString(dataInput);
             //读属性字段结构
-            List<GISField> fields = readFields(mfh.fieldCount, br);
+            List<GISField> fields = readFields(mfh.fieldCount, dataInput);
             //定义图层
             SHAPETYPE ShapeType = Enum.valueOf(SHAPETYPE.class, String.valueOf(mfh.shapeType));
             GISExtent extent = new GISExtent(new GISVertex(mfh.minx, mfh.miny), new GISVertex(mfh.maxx, mfh.maxy));
             layer = new GISVectorLayer(name, ShapeType, extent, fields);
             //读空间对象类型
             for (int i = 0; i < mfh.featureCount; i++) {
-                GISSpatial spatial = readSpatial(ShapeType, br);
-                GISAttribute attribute = readAttribute(br, fields);
-                layer.addFeature(new GISFeature(spatial, attribute),false);
+                GISSpatial spatial = readSpatial(ShapeType, dataInput);
+                GISAttribute attribute = readAttribute(dataInput, fields);
+                layer.addFeature(new GISFeature(spatial, attribute), false);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -78,10 +107,9 @@ public class GISMyFile {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            //关闭文件并返回结果
             try {
-                if (br != null)
-                    br.close();
+                dataInput.close();
+                bufferInput.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -90,7 +118,7 @@ public class GISMyFile {
         return layer;
     }
 
-    public static void writeFileHeader(GISVectorLayer layer, RandomAccessFile bw) throws IOException {
+    public static void writeFileHeader(GISVectorLayer layer, DataOutputStream bw) throws IOException {
         MyFileHeader mfh = new MyFileHeader();
         mfh.minx = layer.extent.getMinX();
         mfh.miny = layer.extent.getMinY();
@@ -99,10 +127,10 @@ public class GISMyFile {
         mfh.featureCount = layer.features.size();
         mfh.shapeType = layer.shapeType.getValue();
         mfh.fieldCount = layer.fields.size();
-        bw.write(GISTools.toBytes(mfh));
+        mfh.write(bw);
     }
 
-    private static List<GISVertex> readMultipleVertexes(RandomAccessFile br) throws IOException {
+    private static List<GISVertex> readMultipleVertexes(DataInputStream br) throws IOException {
         List<GISVertex> vs = new ArrayList<>();
         int vcount = br.readInt();
         for (int vc = 0; vc < vcount; vc++)
@@ -110,7 +138,7 @@ public class GISMyFile {
         return vs;
     }
 
-    private static GISAttribute readAttribute(RandomAccessFile br, List<GISField> fields) throws IOException, ClassNotFoundException {
+    private static GISAttribute readAttribute(DataInputStream br, List<GISField> fields) throws IOException, ClassNotFoundException {
         GISAttribute a = new GISAttribute();
         int count = br.readInt();
         for (int vc = 0; vc < count; vc++)
@@ -118,7 +146,7 @@ public class GISMyFile {
         return a;
     }
 
-    private static GISSpatial readSpatial(SHAPETYPE shapeType, RandomAccessFile br) throws IOException {
+    private static GISSpatial readSpatial(SHAPETYPE shapeType, DataInputStream br) throws IOException {
         if (shapeType == SHAPETYPE.point)
             return new GISPoint(new GISVertex(br));
         if (shapeType == SHAPETYPE.polyline)
@@ -137,14 +165,17 @@ public class GISMyFile {
     }
 
     public static void writeFileMultiLayers(List<GISVectorLayer> layers, String fileName) {
-        RandomAccessFile randomAccessFile = null;
+        BufferedOutputStream bufferOut = null;
+        DataOutputStream dataOut = null;
         try {
-            randomAccessFile = new RandomAccessFile(fileName, "rw");
+            Path path = Paths.get(fileName);
+            bufferOut = new BufferedOutputStream(Files.newOutputStream(path, StandardOpenOption.WRITE));
+            dataOut = new DataOutputStream(bufferOut);
             for (GISVectorLayer layer : layers) {
-                writeFileHeader(layer, randomAccessFile);
-                GISTools.writeString(layer.name, randomAccessFile);
-                writeFields(layer.fields, randomAccessFile);
-                writeFeatures(layer.features, randomAccessFile);
+                writeFileHeader(layer, dataOut);
+                GISTools.writeString(layer.name, dataOut);
+                writeFields(layer.fields, dataOut);
+                writeFeatures(layer.features, dataOut);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -152,19 +183,20 @@ public class GISMyFile {
             e.printStackTrace();
         } finally {
             try {
-                if (randomAccessFile != null) randomAccessFile.close();
+                dataOut.close();
+                bufferOut.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void writeFeatures(List<GISFeature> features, RandomAccessFile randomAccessFile) throws IOException {
+    private static void writeFeatures(List<GISFeature> features, DataOutputStream randomAccessFile) throws IOException {
         for (GISFeature feature : features)
             writeFeature(feature, randomAccessFile);
     }
 
-    public static void writeFeature(GISFeature feature, RandomAccessFile bw) throws IOException {
+    public static void writeFeature(GISFeature feature, DataOutputStream bw) throws IOException {
         if (feature.spatial instanceof GISPoint) {
             ((GISPoint) feature.spatial).center.writeVertex(bw);
         }
@@ -177,19 +209,19 @@ public class GISMyFile {
         writeAttribute(feature.attribute, bw);
     }
 
-    private static void writeAttribute(GISAttribute attribute, RandomAccessFile bw) throws IOException {
+    private static void writeAttribute(GISAttribute attribute, DataOutputStream bw) throws IOException {
         bw.write(attribute.values.size());
         for (Object value : attribute.values)
             GISTools.writeString(value.toString(), bw);
     }
 
-    private static void writeMultipleVertexes(List<GISVertex> vertices, RandomAccessFile bw) throws IOException {
+    private static void writeMultipleVertexes(List<GISVertex> vertices, DataOutputStream bw) throws IOException {
         bw.write(vertices.size());
         for (int vc = 0; vc < vertices.size(); vc++)
             vertices.get(vc).writeVertex(bw);
     }
 
-    private static void writeFields(List<GISField> fields, RandomAccessFile randomAccessFile) {
+    private static void writeFields(List<GISField> fields, DataOutputStream randomAccessFile) {
         for (GISField field : fields) {
             GISTools.writeString(field.dataType.getName(), randomAccessFile);
             GISTools.writeString(field.fieldName, randomAccessFile);
@@ -204,20 +236,24 @@ public class GISMyFile {
     }
 
     public static List<GISVectorLayer> readFileMultiLayers(String fileName) {
-        RandomAccessFile randomAccessFile = null;
+        BufferedInputStream bufferInput = null;
+        DataInputStream dataInput = null;
         List<GISVectorLayer> layers = new ArrayList<>();
         try {
-            randomAccessFile = new RandomAccessFile(fileName, "r");
-            while (randomAccessFile.read() != -1) {
-                MyFileHeader mfh = (MyFileHeader) GISTools.fromBytes(randomAccessFile, MyFileHeader.class);
+            Path path = Paths.get(fileName);
+            bufferInput = new BufferedInputStream(Files.newInputStream(path));
+            dataInput = new DataInputStream(bufferInput);
+            do {
+                MyFileHeader mfh = new MyFileHeader();
+                mfh.read(dataInput);
                 SHAPETYPE shapetype = Enum.valueOf(SHAPETYPE.class, String.valueOf(mfh.shapeType));
                 GISExtent extent = new GISExtent(mfh.minx, mfh.maxx, mfh.miny, mfh.maxy);
-                String layerName = GISTools.readString(randomAccessFile);
-                List<GISField> fields = readFields(mfh.fieldCount, randomAccessFile);
+                String layerName = GISTools.readString(dataInput);
+                List<GISField> fields = readFields(mfh.fieldCount, dataInput);
                 GISVectorLayer layer = new GISVectorLayer(layerName, shapetype, extent, fields);
-                readFeatures(layer, randomAccessFile, mfh.featureCount);
+                readFeatures(layer, dataInput, mfh.featureCount);
                 layers.add(layer);
-            }
+            } while (dataInput.read() != -1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -226,7 +262,8 @@ public class GISMyFile {
             e.printStackTrace();
         } finally {
             try {
-                if (randomAccessFile != null) randomAccessFile.close();
+                dataInput.close();
+                bufferInput.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -235,7 +272,7 @@ public class GISMyFile {
         return layers;
     }
 
-    private static List<GISField> readFields(int fieldCount, RandomAccessFile br) throws ClassNotFoundException {
+    private static List<GISField> readFields(int fieldCount, DataInputStream br) throws ClassNotFoundException {
         List<GISField> fields = new ArrayList<>();
         for (int fieldindex = 0; fieldindex < fieldCount; fieldindex++) {
             fields.add(new GISField(br));
@@ -243,11 +280,11 @@ public class GISMyFile {
         return fields;
     }
 
-    private static void readFeatures(GISVectorLayer layer, RandomAccessFile randomAccessFile, int featureCount) throws IOException, ClassNotFoundException {
+    private static void readFeatures(GISVectorLayer layer, DataInputStream randomAccessFile, int featureCount) throws IOException, ClassNotFoundException {
         for (int i = 0; i < featureCount; i++) {
             GISSpatial spatial = readSpatial(layer.shapeType, randomAccessFile);
             GISAttribute attribute = readAttribute(randomAccessFile, layer.fields);
-            layer.addFeature(new GISFeature(spatial, attribute),false);
+            layer.addFeature(new GISFeature(spatial, attribute), false);
         }
     }
 }

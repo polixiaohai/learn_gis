@@ -3,22 +3,32 @@ package org.walkgis.learngis.lesson20.basicclasses;
 public class GISExtent {
     public GISVertex bottomLeft;
     public GISVertex upRight;
+    public Double area;
     private double zoomingFactor = 2;
     private double movingFactor = 0.25;
 
     public GISExtent(GISVertex bottomLeft, GISVertex upRight) {
         this.bottomLeft = bottomLeft;
         this.upRight = upRight;
+        this.area = getWidth() * getHeight();
     }
 
     public GISExtent(double x1, double x2, double y1, double y2) {
         this.upRight = new GISVertex(Math.max(x1, x2), Math.max(y1, y2));
         this.bottomLeft = new GISVertex(Math.min(x1, x2), Math.min(y1, y2));
+        this.area = getWidth() * getHeight();
     }
 
     public GISExtent(GISExtent extent) {
-        upRight = new GISVertex(extent.upRight);
-        bottomLeft = new GISVertex(extent.bottomLeft);
+        this.upRight = new GISVertex(extent.upRight);
+        this.bottomLeft = new GISVertex(extent.bottomLeft);
+        this.area = getWidth() * getHeight();
+    }
+
+    public GISExtent(GISExtent e1, GISExtent e2) {
+        this.upRight = new GISVertex(Math.max(e1.upRight.x, e2.upRight.x), Math.max(e1.upRight.y, e2.upRight.y));
+        this.bottomLeft = new GISVertex(Math.min(e1.bottomLeft.x, e2.bottomLeft.x), Math.min(e1.bottomLeft.y, e2.bottomLeft.y));
+        this.area = getWidth() * getHeight();
     }
 
     public void changeExtent(GISMapAction action) {
@@ -60,6 +70,7 @@ public class GISExtent {
         upRight.y = newMaxY;
         bottomLeft.x = newMinX;
         bottomLeft.y = newMinY;
+        this.area = getWidth() * getHeight();
     }
 
     public double getMinX() {
@@ -89,6 +100,7 @@ public class GISExtent {
     public void copyFrom(GISExtent extent) {
         upRight.copyFrom(extent.upRight);
         bottomLeft.copyFrom(extent.bottomLeft);
+        this.area = getWidth() * getHeight();
     }
 
     /**
@@ -119,5 +131,6 @@ public class GISExtent {
         upRight.y = Math.max(upRight.y, extent.upRight.y);
         bottomLeft.x = Math.min(bottomLeft.x, extent.bottomLeft.x);
         bottomLeft.y = Math.min(bottomLeft.y, extent.bottomLeft.y);
+        this.area = getWidth() * getHeight();
     }
 }

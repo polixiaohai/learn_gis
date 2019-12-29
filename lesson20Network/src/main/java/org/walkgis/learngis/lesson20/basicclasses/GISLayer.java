@@ -1,10 +1,8 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
 import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 public abstract class GISLayer {
     public String name;
@@ -14,4 +12,8 @@ public abstract class GISLayer {
     public LAYERTYPE layerType;
 
     public abstract void draw(Graphics2D graphics2D, GISView view, GISExtent extent);
+
+    public abstract void write(DataOutputStream dataOutputStream);
+
+    public abstract void read(DataInputStream dataInputStream);
 }

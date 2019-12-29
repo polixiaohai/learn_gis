@@ -1,5 +1,6 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -16,7 +17,7 @@ public class GISVertex {
         this.y = y;
     }
 
-    public GISVertex(RandomAccessFile randomAccessFile) throws IOException {
+    public GISVertex(DataInputStream randomAccessFile) throws IOException {
         this.x = randomAccessFile.readDouble();
         this.y = randomAccessFile.readDouble();
     }
@@ -34,7 +35,7 @@ public class GISVertex {
         this.y = gisVertex.y;
     }
 
-    public void writeVertex(RandomAccessFile bw) {
+    public void writeVertex(DataOutputStream bw) {
         try {
             bw.writeDouble(x);
             bw.writeDouble(y);

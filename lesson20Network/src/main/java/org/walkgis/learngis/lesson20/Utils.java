@@ -4,13 +4,13 @@ public class Utils {
     /**
      * 转换short为byte
      *
-     * @param b
-     * @param s     需要转换的short
-     * @param index
+     * @param s 需要转换的short
      */
-    public static void short2Bytes(byte[] b, short s, int index) {
-        b[index + 1] = (byte) (s >> 8);
-        b[index + 0] = (byte) (s >> 0);
+    public static byte[] short2Bytes(short s) {
+        byte[] b = new byte[2];
+        b[1] = (byte) (s >> 8);
+        b[0] = (byte) (s >> 0);
+        return b;
     }
 
     /**

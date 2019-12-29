@@ -3,6 +3,10 @@ package org.walkgis.learngis.lesson20.basicclasses;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -123,70 +127,65 @@ public class GISDocument {
 
     public void read(String documentFilePath) {
         layers.clear();
-        RandomAccessFile randomAccessFile = null;
+        BufferedInputStream inputStream = null;
+        DataInputStream dataInputStream = null;
         try {
-            randomAccessFile = new RandomAccessFile(new File(documentFilePath), "r");
-            int length = -1;
-
-            while ((length = randomAccessFile.readInt()) != -1) {
-                if (length == -1) break;
-                byte[] bytes = new byte[length];
-                randomAccessFile.read(bytes);
-                String path = new String(bytes, StandardCharsets.UTF_8);
-                GISLayer layer = addLayer(path);
-                layer.path = path;
-                layer.name = new File(path).getName();
-                layer.visible = randomAccessFile.readBoolean();
-                if (layer instanceof GISVectorLayer) {
-                    GISVectorLayer vectorLayer = (GISVectorLayer) layer;
-                    vectorLayer.drawAttributeOrNot = randomAccessFile.readBoolean();
-                    vectorLayer.labelIndex = randomAccessFile.readInt();
-                    vectorLayer.selectable = randomAccessFile.readBoolean();
+            inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(documentFilePath), StandardOpenOption.READ));
+            dataInputStream = new DataInputStream(inputStream);
+            do {
+                int layerSize = dataInputStream.readInt();
+                for (int i = 0; i < layerSize; i++) {
+                    String layerPath = dataInputStream.readUTF();
+                    String ext = layerPath.substring(layerPath.lastIndexOf("."));
+                    GISLayer layer = null;
+                    if (ext.equalsIgnoreCase("." + GISConst.SHP)) {
+                        layer = new GISVectorLayer();
+                        layer.read(dataInputStream);
+                        layer.path = layerPath;
+                    } else if (ext.equalsIgnoreCase("." + GISConst.RASTER)) {
+                        layer = new GISRasterLayer();
+                        layer.read(dataInputStream);
+                        layer.path = layerPath;
+                    }
+                    this.layers.add(layer);
                 }
-            }
+            } while (dataInputStream.read() != -1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (randomAccessFile != null) {
-                try {
-                    randomAccessFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                dataInputStream.close();
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     public void write(String documentFilePath) {
-        RandomAccessFile randomAccessFile = null;
+        BufferedOutputStream outputStream = null;
+        DataOutputStream dataOutputStream = null;
         try {
-            randomAccessFile = new RandomAccessFile(new File(documentFilePath), "rw");
+            outputStream = new BufferedOutputStream(Files.newOutputStream(Paths.get(documentFilePath), StandardOpenOption.CREATE));
+            dataOutputStream = new DataOutputStream(outputStream);
+            dataOutputStream.writeInt(layers.size());
             for (int i = 0; i < layers.size(); i++) {
                 if (layers.get(i).path == null) return;
                 GISLayer layer = layers.get(i);
-                GISTools.writeString(layer.path, randomAccessFile);
-                randomAccessFile.writeBoolean(layer.visible);
-                if (layer instanceof GISVectorLayer) {
-                    GISVectorLayer vectorLayer = (GISVectorLayer) layer;
-                    randomAccessFile.writeBoolean(vectorLayer.drawAttributeOrNot);
-                    randomAccessFile.writeInt(vectorLayer.labelIndex);
-                    randomAccessFile.writeBoolean(vectorLayer.selectable);
-                }
+                layer.write(dataOutputStream);
             }
-            randomAccessFile.writeInt(-1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (randomAccessFile != null) {
-                try {
-                    randomAccessFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                dataOutputStream.close();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

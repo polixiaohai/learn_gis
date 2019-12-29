@@ -1,21 +1,11 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
-
-import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
-import org.walkgis.learngis.lesson20.Utils;
 import org.walkgis.learngis.lesson20.basicclasses.io.GISMyFile;
-import sun.misc.Unsafe;
-
 import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -97,7 +87,7 @@ public class GISTools {
         return ab.x * bc.x + ab.y * bc.y;
     }
 
-    public static void writeString(String s, RandomAccessFile bw) {
+    public static void writeString(String s, DataOutputStream bw) {
         try {
             bw.writeInt(stringLength(s));
             byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
@@ -107,7 +97,7 @@ public class GISTools {
         }
     }
 
-    public static String readString(RandomAccessFile br) {
+    public static String readString(DataInputStream br) {
         try {
             int length = br.readInt();
             byte[] bytes = new byte[length];
@@ -177,119 +167,6 @@ public class GISTools {
     public static Color getGradualColor(int levelIndex, int levelNumber) {
         int colorLevel = (int) (255 - (float) levelIndex / levelNumber * 255);
         return new Color(colorLevel, colorLevel, colorLevel);
-    }
-
-    public static Object fromBytes(RandomAccessFile br, Class clazz) {
-        try {
-            byte[] intByte = new byte[4];
-            byte[] doubleByte = new byte[8];
-            byte[] longByte = new byte[8];
-            byte[] shortByte = new byte[4];
-            if (clazz == GISField.DBFField.class) {
-                //region DBFField
-                GISField.DBFField field = new GISField.DBFField();
-                field.b1 = br.readByte();
-                field.b2 = br.readByte();
-                field.b3 = br.readByte();
-                field.b4 = br.readByte();
-                field.b5 = br.readByte();
-                field.b6 = br.readByte();
-                field.b7 = br.readByte();
-                field.b8 = br.readByte();
-                field.b9 = br.readByte();
-                field.b10 = br.readByte();
-                field.b11 = br.readByte();
-                field.fieldType = br.readChar();
-                br.read(intByte);
-                field.displacementInRecord = Utils.bytes2Int(intByte, 0);
-                field.Unused19 = br.readByte();
-                field.Unused20 = br.readByte();
-                field.Unused21 = br.readByte();
-                field.Unused22 = br.readByte();
-                field.Unused23 = br.readByte();
-                field.Unused24 = br.readByte();
-                field.Unused25 = br.readByte();
-                field.Unused26 = br.readByte();
-                field.Unused27 = br.readByte();
-                field.Unused28 = br.readByte();
-                field.Unused29 = br.readByte();
-                field.Unused30 = br.readByte();
-                field.Unused31 = br.readByte();
-                field.Unused32 = br.readByte();
-                //endregion
-                return field;
-            } else if (clazz == GISMyFile.MyFileHeader.class) {
-                //region MyFileHeader
-                GISMyFile.MyFileHeader header = new GISMyFile.MyFileHeader();
-                br.read(doubleByte);
-                header.minx = Utils.bytes2Double(doubleByte, 0);
-                br.read(doubleByte);
-                header.miny = Utils.bytes2Double(doubleByte, 0);
-                br.read(doubleByte);
-                header.maxx = Utils.bytes2Double(doubleByte, 0);
-                br.read(doubleByte);
-                header.maxy = Utils.bytes2Double(doubleByte, 0);
-                br.read(intByte);
-                header.shapeType = Utils.bytes2Int(doubleByte, 0);
-                br.read(intByte);
-                header.fieldCount = Utils.bytes2Int(doubleByte, 0);
-                br.read(intByte);
-                header.featureCount = Utils.bytes2Int(doubleByte, 0);
-                //endregion
-                return header;
-            } else if (clazz == GISShapefile.DBFHeader.class) {
-                //region DBFHeader
-                GISShapefile.DBFHeader header = new GISShapefile.DBFHeader();
-                header.FileType = br.readChar();
-                header.Year = br.readChar();
-                header.Month = br.readChar();
-                header.Day = br.readChar();
-                br.read(intByte);
-                header.RecordCount = Utils.bytes2Int(intByte, 0);
-                br.read(shortByte);
-                header.HeaderLength = Utils.bytes2Short(shortByte, 0);
-                br.read(shortByte);
-                header.RecordLength = Utils.bytes2Short(shortByte, 0);
-                br.read(longByte);
-                header.Unused1 = Utils.bytesToLong(longByte);
-                br.read(longByte);
-                header.Unused2 = Utils.bytesToLong(longByte);
-                header.Unused3 = br.readChar();
-                header.Unused4 = br.readChar();
-                br.read(shortByte);
-                header.Unused5 = Utils.bytes2Short(shortByte, 0);
-                //endregion
-                return header;
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static byte[] toBytes(Object obj) {
-        byte[] bytes = null;
-        ByteArrayOutputStream bos = null;
-        ObjectOutputStream oos = null;
-        try {
-            bos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(bos);
-            oos.writeObject(obj);
-            oos.flush();
-            bytes = bos.toByteArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                if (oos != null) oos.close();
-                if (oos != null) bos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return bytes;
     }
 
     public static String bytesToString(byte[] byteArray) {

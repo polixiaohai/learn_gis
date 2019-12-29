@@ -1,7 +1,10 @@
 package org.walkgis.learngis.lesson20.basicclasses;
 
 import java.awt.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +13,7 @@ public class GISVectorLayer extends GISLayer {
     public THEMATICTYPE thematictype;
     public HashMap<Object, GISThematic> thematics = new HashMap<>();
     public int thematicIndex;
-    public Boolean drawAttributeOrNot = true;
+    public Boolean drawAttributeOrNot = false;
     public boolean selectable = true;
     public int labelIndex = 0;
     public SHAPETYPE shapeType;
@@ -18,6 +21,10 @@ public class GISVectorLayer extends GISLayer {
     public List<GISFeature> features = new ArrayList<GISFeature>();
     public List<GISFeature> selection = new ArrayList<>();
     public List<Integer> levelIndexs = new ArrayList<>();
+
+    public GISVectorLayer() {
+        this.layerType = LAYERTYPE.VectorLayer;
+    }
 
     public GISVectorLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields) {
         this.name = new File(shpFilePath).getName();
@@ -60,6 +67,34 @@ public class GISVectorLayer extends GISLayer {
                 if (extent.insertectOrNot(features.get(i).spatial.extent))
                     features.get(i).draw(graphics2D, view, drawAttributeOrNot, labelIndex, thematic);
             }
+        }
+    }
+
+    @Override
+    public void write(DataOutputStream dataOutputStream) {
+        try {
+            dataOutputStream.writeUTF(this.path);
+
+            dataOutputStream.writeBoolean(this.visible);
+            dataOutputStream.writeBoolean(this.drawAttributeOrNot);
+            dataOutputStream.writeInt(this.labelIndex);
+            dataOutputStream.writeBoolean(this.selectable);
+            GISShapefile gisShapefile = new GISShapefile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void read(DataInputStream dataInputStream) {
+        try {
+            this.name = new File(path).getName();
+            this.visible = dataInputStream.readBoolean();
+            this.drawAttributeOrNot = dataInputStream.readBoolean();
+            this.labelIndex = dataInputStream.readInt();
+            this.selectable = dataInputStream.readBoolean();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

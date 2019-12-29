@@ -47,6 +47,38 @@ public class GISShapefile {
         public long Unused1, Unused2;  //16个reserved
         public char Unused3, Unused4;
         public short Unused5;
+
+        //写入数据
+        public void write(DataOutputStream out) throws IOException {
+            out.writeChar(this.FileType);
+            out.writeChar(this.Year);
+            out.writeChar(this.Month);
+            out.writeChar(this.Day);
+            out.writeInt(this.RecordCount);
+            out.writeShort(this.HeaderLength);
+            out.writeShort(this.RecordLength);
+            out.writeLong(this.Unused1);
+            out.writeLong(this.Unused2);
+            out.writeChar(this.Unused3);
+            out.writeChar(this.Unused4);
+            out.writeShort(this.Unused5);
+        }
+
+        //读取数据
+        public void read(DataInputStream input) throws IOException {
+            this.FileType = input.readChar();
+            this.Year = input.readChar();
+            this.Month = input.readChar();
+            this.Day = input.readChar();
+            this.RecordCount = input.readInt();
+            this.HeaderLength = input.readShort();
+            this.RecordLength = input.readShort();
+            this.Unused1 = input.readLong();
+            this.Unused2 = input.readLong();
+            this.Unused3 = input.readChar();
+            this.Unused4 = input.readChar();
+            this.Unused5 = input.readShort();
+        }
     }
 
     public ShapefileHeader readFileHeader(DataInputStream dataInputStream) {
@@ -220,14 +252,14 @@ public class GISShapefile {
                 if (ShapeType == SHAPETYPE.point) {
                     GISPoint onepoint = readPoint(recordContent);
                     GISFeature onefeature = new GISFeature(onepoint, new GISAttribute(rowValues));
-                    layer.addFeature(onefeature,false);
+                    layer.addFeature(onefeature, false);
                 } else if (ShapeType == SHAPETYPE.polyline) {
                     List<GISPolyline> lines = readLines(recordContent);
                     GISVectorLayer finalLayer = layer;
                     Object[] finalRowValues = rowValues;
                     lines.forEach(line -> {
                         GISFeature onefeature = new GISFeature(line, new GISAttribute(finalRowValues));
-                        finalLayer.addFeature(onefeature,false);
+                        finalLayer.addFeature(onefeature, false);
                     });
                 } else if (ShapeType == SHAPETYPE.polygon) {
                     List<GISPolygon> polygons = readPolygons(recordContent);
@@ -235,7 +267,7 @@ public class GISShapefile {
                     Object[] finalRowValues1 = rowValues;
                     polygons.forEach(polygon -> {
                         GISFeature onefeature = new GISFeature(polygon, new GISAttribute(finalRowValues1));
-                        finalLayer1.addFeature(onefeature,false);
+                        finalLayer1.addFeature(onefeature, false);
                     });
                 }
             }
@@ -297,23 +329,27 @@ public class GISShapefile {
     }
 
     private void readDBFFile(String dbffilename, List<GISField> fields, List<GISAttribute> attributes) {
-        RandomAccessFile br = null;
+        BufferedInputStream bufferInput = null;
+        DataInputStream dataInput = null;
         try {
-            br = new RandomAccessFile(dbffilename, "r");
-            DBFHeader dh = (DBFHeader) GISTools.fromBytes(br, DBFHeader.class);
+            bufferInput = new BufferedInputStream(new FileInputStream(dbffilename));
+            dataInput = new DataInputStream(bufferInput);
+            DBFHeader dh = new DBFHeader();
+            dh.read(dataInput);
+
             int FieldCount = (dh.HeaderLength - 33) / 32;
             //读字段结构
             fields.clear();
             for (int i = 0; i < FieldCount; i++)
-                fields.add(new GISField(br));
-            byte END = br.readByte();  //1个字节作为记录项终止标识。
+                fields.add(new GISField(dataInput));
+            byte END = dataInput.readByte();  //1个字节作为记录项终止标识。
             //读具体数值
             attributes.clear();
             for (int i = 0; i < dh.RecordCount; i++) {
                 GISAttribute attribute = new GISAttribute();
-                char tempchar = (char) br.readByte();  //每个记录的开始都有一个起始字节
+                char tempchar = (char) dataInput.readByte();  //每个记录的开始都有一个起始字节
                 for (int j = 0; j < FieldCount; j++)
-                    attribute.addValue(fields.get(j).DBFValueToObject(br));
+                    attribute.addValue(fields.get(j).DBFValueToObject(dataInput));
                 attributes.add(attribute);
             }
         } catch (FileNotFoundException e) {
@@ -323,12 +359,11 @@ public class GISShapefile {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                dataInput.close();
+                bufferInput.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

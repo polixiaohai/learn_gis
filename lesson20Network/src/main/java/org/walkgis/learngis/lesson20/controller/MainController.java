@@ -70,7 +70,7 @@ public class MainController implements Initializable {
     private MainView mainView;
 
     private ContextMenu contextMenu;
-    private MenuItem menuDocument, select, zoomIn, zoomOut, pan, fullScreen, menuLayerControl;
+    private MenuItem menuDocument, select, selectElement, zoomIn, zoomOut, pan, fullScreen, menuLayerControl;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -323,22 +323,24 @@ public class MainController implements Initializable {
         contextMenu = new ContextMenu();
 
         menuDocument = new MenuItem("地图文档");
-        select = new MenuItem("select");
-        zoomIn = new MenuItem("ZoomIn");
-        zoomOut = new MenuItem("zoomOut");
-        pan = new MenuItem("pan");
-        fullScreen = new MenuItem("FullScreen");
+        select = new MenuItem("选择要素");
+        selectElement = new MenuItem("选择元素");
+        zoomIn = new MenuItem("放大");
+        zoomOut = new MenuItem("缩小");
+        pan = new MenuItem("平移");
+        fullScreen = new MenuItem("全屏");
         menuLayerControl = new MenuItem("图层控制");
 
         menuDocument.setOnAction(this::contextMenuClick);
         select.setOnAction(this::contextMenuClick);
+        selectElement.setOnAction(this::contextMenuClick);
         zoomIn.setOnAction(this::contextMenuClick);
         zoomOut.setOnAction(this::contextMenuClick);
         pan.setOnAction(this::contextMenuClick);
         fullScreen.setOnAction(this::contextMenuClick);
         menuLayerControl.setOnAction(this::contextMenuClick);
 
-        contextMenu.getItems().addAll(select, zoomIn, zoomOut, pan, fullScreen);
+        contextMenu.getItems().addAll(select, selectElement, zoomIn, zoomOut, pan, fullScreen);
     }
 
     @FXML
@@ -354,7 +356,7 @@ public class MainController implements Initializable {
         } else {
             if (actionEvent.getTarget() == select) {
                 mouseCommand = MouseCommand.Select;
-                GUIState.getScene().setCursor(Cursor.CLOSED_HAND);
+                GUIState.getScene().setCursor(Cursor.HAND);
             } else if (actionEvent.getTarget() == zoomIn) {
                 mouseCommand = MouseCommand.ZoomIn;
                 GUIState.getScene().setCursor(Cursor.DEFAULT);
@@ -363,7 +365,10 @@ public class MainController implements Initializable {
                 GUIState.getScene().setCursor(Cursor.DEFAULT);
             } else if (actionEvent.getTarget() == pan) {
                 mouseCommand = MouseCommand.Pan;
-                GUIState.getScene().setCursor(Cursor.MOVE);
+                GUIState.getScene().setCursor(Cursor.OPEN_HAND);
+            } else if (actionEvent.getTarget() == selectElement) {
+                mouseCommand = MouseCommand.Unused;
+                GUIState.getScene().setCursor(Cursor.DEFAULT);
             }
         }
     }
@@ -375,6 +380,8 @@ public class MainController implements Initializable {
 
     @FXML
     private void canvasMouseReleased(MouseEvent mouseEvent) {
+        mouseStartX = (int) mouseEvent.getX();
+        mouseStartY = (int) mouseEvent.getY();
         if (document.isEmpty()) return;
         if (!mouseOnMap) return;
         mouseOnMap = false;
@@ -526,10 +533,11 @@ public class MainController implements Initializable {
 
     @FXML
     private void canvasClick(MouseEvent event) {
+        mouseStartX = (int) event.getX();
+        mouseStartY = (int) event.getY();
         if (contextMenu != null) {
             contextMenu.hide();
         }
-
         if (event.getClickCount() == 2 && event.getButton().name().equals("PRIMARY")) {
             if (chbAddPoint.isSelected()) {
                 checkLayers();
