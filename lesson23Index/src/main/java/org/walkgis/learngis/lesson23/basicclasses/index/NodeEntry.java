@@ -2,7 +2,6 @@ package org.walkgis.learngis.lesson23.basicclasses.index;
 
 import org.walkgis.learngis.lesson23.basicclasses.GISExtent;
 import org.walkgis.learngis.lesson23.basicclasses.GISFeature;
-
 import java.util.ArrayList;
 import java.util.List;
 

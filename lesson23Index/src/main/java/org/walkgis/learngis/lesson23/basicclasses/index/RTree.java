@@ -1,12 +1,8 @@
 package org.walkgis.learngis.lesson23.basicclasses.index;
 
 
-import javafx.beans.property.DoubleProperty;
-import org.walkgis.learngis.lesson23.basicclasses.GISExtent;
-import org.walkgis.learngis.lesson23.basicclasses.GISFeature;
-import org.walkgis.learngis.lesson23.basicclasses.GISVectorLayer;
+import org.walkgis.learngis.lesson23.basicclasses.*;
 
-import javax.xml.soap.Node;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,9 +56,40 @@ public class RTree {
         adjustTree(parentNode, uncleNode);
     }
 
+    public GISVectorLayer getTreeLayer() {
+        List<NodeEntry> nodes = new ArrayList<>();
+        nodeList(nodes, root);
+        List<GISField> fields = new ArrayList<>();
+        fields.add(new GISField(Integer.class, "Level"));
+        GISVectorLayer treeLayer = new GISVectorLayer("treeLayer", SHAPETYPE.polyline, null, fields);
+        for (int i = 0; i < nodes.size(); i++) {
+            List<GISVertex> vs = new ArrayList<>();
+            vs.add(new GISVertex(nodes.get(i).mbr.getMaxX(), nodes.get(i).mbr.getMaxY()));
+            vs.add(new GISVertex(nodes.get(i).mbr.getMaxX(), nodes.get(i).mbr.getMinY()));
+            vs.add(new GISVertex(nodes.get(i).mbr.getMinX(), nodes.get(i).mbr.getMinY()));
+            vs.add(new GISVertex(nodes.get(i).mbr.getMinX(), nodes.get(i).mbr.getMaxY()));
+            vs.add(new GISVertex(nodes.get(i).mbr.getMaxX(), nodes.get(i).mbr.getMaxY()));
+            GISPolyline line = new GISPolyline(vs);
+            GISAttribute a = new GISAttribute();
+            a.addValue(nodes.get(i).level);
+            treeLayer.addFeature(new GISFeature(line, a), true);
+        }
+        return treeLayer;
+    }
+
+    private void nodeList(List<NodeEntry> nodes, NodeEntry node) {
+        nodes.add(node);
+        if (node.entries == null) return;
+        for (int i = 0; i < node.entries.size(); i++)
+            nodeList(nodes, node.entries.get(i));
+    }
+
     private void adjustTree(NodeEntry oneNode, NodeEntry splitNode) {
+        //oneNode是根节点
         if (oneNode.parent == null) {
+            //出现一个兄弟，则需要向上生长
             if (splitNode != null) {
+                //新生长的根结点，肯定不是叶子结点
                 NodeEntry newRoot = new NodeEntry(oneNode.level + 1);
                 newRoot.addEntry(oneNode);
                 newRoot.addEntry(splitNode);
@@ -70,8 +97,11 @@ public class RTree {
             }
             return;
         }
+        //找到原有结点的夫结点
         NodeEntry parent = oneNode.parent;
+        //调整父结点的mbr
         parent.mbr.merge(oneNode.mbr);
+        //将被分割出来的结点插入父结点的入口列表
         insertNode(parent, splitNode);
     }
 
@@ -79,7 +109,7 @@ public class RTree {
         //找到两个种子的entities序号，seed2》seed1
         int seed1 = 0, seed2 = 1;
         //寻找可以最大化未重叠面积的，即两个种子间隔最远
-        double maxArea = Double.MIN_VALUE;
+        double maxArea = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < oneNode.entries.size() - 1; i++)
             for (int j = i + 1; j < oneNode.entries.size(); j++) {
                 //计算未覆盖面积
@@ -142,7 +172,7 @@ public class RTree {
     }
 
     private int pickNext(NodeEntry firstNode, NodeEntry secondNode, List<NodeEntry> entries, Double maxDiffArea) {
-        maxDiffArea = Double.MAX_VALUE;
+        maxDiffArea = Double.NEGATIVE_INFINITY;
         int index = -1;
         for (int i = 0; i < entries.size(); i++) {
             double diffArea = enlargedArea(firstNode, entries.get(i)) - enlargedArea(secondNode, entries.get(i));
@@ -159,7 +189,7 @@ public class RTree {
         //如果到达叶子结点，就返回
         if (node.level == 1) return node;
         //寻找扩大面积最小的子结点序号
-        double minEnlargement = Double.MAX_VALUE;
+        double minEnlargement = Double.POSITIVE_INFINITY;
         int minIndex = -1;
         for (int i = 0; i < node.entries.size(); i++) {
             double enlargement = enlargedArea(node.entries.get(i), entry);

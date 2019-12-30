@@ -1,6 +1,7 @@
 package org.walkgis.learngis.lesson23.basicclasses;
 
 import org.walkgis.learngis.lesson23.basicclasses.io.GISMyFile;
+
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -183,9 +184,11 @@ public class GISTools {
     public static GISLayer getLayer(String path) {
         GISLayer layer = null;
         String fileType = path.substring(path.lastIndexOf("."));
-        if (fileType.equalsIgnoreCase("." + GISConst.SHP))
-            layer = new GISShapefile().readShapefile(path);
-        else if (fileType.equalsIgnoreCase("." + GISConst.MYFILE))
+        if (fileType.equalsIgnoreCase("." + GISConst.SHP)) {
+            GISVectorLayer gisVectorLayer = new GISShapefile().readShapefile(path);
+            gisVectorLayer.buildRTree();
+            layer = gisVectorLayer;
+        } else if (fileType.equalsIgnoreCase("." + GISConst.MYFILE))
             layer = GISMyFile.readFile(path);
         else if (fileType.equalsIgnoreCase("." + GISConst.RASTER))
             layer = new GISRasterLayer(path);

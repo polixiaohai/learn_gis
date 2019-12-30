@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.walkgis.learngis.lesson23.basicclasses.*;
+import org.walkgis.learngis.lesson23.basicclasses.index.RTree;
 import org.walkgis.learngis.lesson23.view.LayerView;
 
 import java.io.File;
@@ -38,12 +39,13 @@ public class LayerController implements Initializable {
     @FXML
     private ColorPicker colorOutside, colorInside;
     @FXML
-    private Button btnApply, btnClose, btnModify, btnThematicApply;
+    private Button btnApply, btnClose, btnModify, btnThematicApply, btnBuildTree, btnClearTree;
     @Autowired
     private LayerView layerView;
 
     @Autowired
     private MainController mainController;
+    private int index = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -61,6 +63,9 @@ public class LayerController implements Initializable {
         btnSaveDocument.setOnMouseClicked(this::btnSaveDocumentClick);
         btnThematicApply.setOnMouseClicked(this::btnThematicApplyClick);
 
+        btnBuildTree.setOnMouseClicked(this::btnBuildTreeClick);
+        btnClearTree.setOnMouseClicked(this::btnClearTreeClick);
+
         cmbTheamticTypes.getItems().add(0, "唯一值专题图");
         cmbTheamticTypes.getItems().add(1, "独立值专题图");
         cmbTheamticTypes.getItems().add(2, "分级设色专题图");
@@ -70,6 +75,33 @@ public class LayerController implements Initializable {
         for (int i = 0, size = mainController.document.layers.size(); i < size; i++)
             layerList.getItems().add(i, mainController.document.layers.get(i).name);
         if (mainController.document.layers.size() > 0) layerList.getSelectionModel().select(0);
+    }
+
+    @FXML
+    private void btnClearTreeClick(MouseEvent mouseEvent) {
+        GISVectorLayer layer = (GISVectorLayer) mainController.document.layers.get(0);
+        layer.rTree = new RTree(layer);
+        index = 0;
+        mainController.updateMap();
+    }
+
+    @FXML
+    private void btnBuildTreeClick(MouseEvent mouseEvent) {
+        if (layerList.getSelectionModel().getSelectedItems().size() == 0) return;
+        GISLayer layer = mainController.document.getLayer(layerList.getSelectionModel().getSelectedItem().toString());
+        if (layer == null) return;
+        if (layer instanceof GISVectorLayer) {
+            RTree rTree = ((GISVectorLayer) layer).rTree;
+            GISVectorLayer treeLayer = rTree.getTreeLayer();
+            if (mainController.document.getLayer(treeLayer.name) != null)
+                mainController.document.removeLayer(treeLayer.name);
+            mainController.document.addLayer(treeLayer);
+
+            if (index == ((GISVectorLayer) layer).featureCount()) return;
+            ((GISVectorLayer) layer).rTree.insertData(index);
+            index++;
+            mainController.updateMap();
+        }
     }
 
     @FXML

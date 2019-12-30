@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
-import org.walkgis.learngis.lesson23.Lesson20Application;
+import org.walkgis.learngis.lesson23.Lesson23Application;
 import org.walkgis.learngis.lesson23.basicclasses.*;
 import org.walkgis.learngis.lesson23.basicclasses.network.GISNetwork;
 import org.walkgis.learngis.lesson23.view.DataTableView;
@@ -293,7 +293,7 @@ public class MainController implements Initializable {
 
         newStage.setScene(newScene);
         newStage.initModality(Modality.NONE);
-        newStage.initOwner(Lesson20Application.getStage());
+        newStage.initOwner(Lesson23Application.getStage());
         newStage.show();
     }
 
@@ -563,7 +563,7 @@ public class MainController implements Initializable {
 
         newStage.setScene(newScene);
         newStage.initModality(Modality.NONE);
-        newStage.initOwner(Lesson20Application.getStage());
+        newStage.initOwner(Lesson23Application.getStage());
         newStage.show();
         if (layer instanceof GISVectorLayer)
             dataTableController.initTable((GISVectorLayer) layer);

@@ -29,27 +29,26 @@ public class GISVectorLayer extends GISLayer {
         this.layerType = LAYERTYPE.VectorLayer;
     }
 
-    public GISVectorLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields) {
-        this(shpFilePath, shapeType, extent);
-        this.fields = fields;
-        makeUnifiedValueMap();
-    }
-
     public GISVectorLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields, boolean needIndex) {
-        this(shpFilePath, shapeType, extent);
+        this.name = new File(shpFilePath).getName();
+        this.path = shpFilePath;
+        this.extent = extent;
         this.fields = fields;
+        this.shapeType = shapeType;
+        this.layerType = LAYERTYPE.VectorLayer;
         makeUnifiedValueMap();
         if (needIndex)
             rTree = new RTree(this);
     }
 
+
+    public GISVectorLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent, List<GISField> fields) {
+        this(shpFilePath, shapeType, extent,fields,true);
+        makeUnifiedValueMap();
+    }
+
     public GISVectorLayer(String shpFilePath, SHAPETYPE shapeType, GISExtent extent) {
-        this.name = new File(shpFilePath).getName();
-        this.path = shpFilePath;
-        this.extent = extent;
-        this.shapeType = shapeType;
-        this.fields = new ArrayList<>();
-        this.layerType = LAYERTYPE.VectorLayer;
+        this(shpFilePath, shapeType, extent, new ArrayList<>(), true);
         makeUnifiedValueMap();
     }
 
